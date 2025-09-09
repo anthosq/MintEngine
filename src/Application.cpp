@@ -11,8 +11,8 @@ namespace Mint {
     }
 
     void Application::Run() {
-        while (true);
+        while(true) {
+        }
     }
-
 
 }

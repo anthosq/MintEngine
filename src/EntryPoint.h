@@ -8,12 +8,14 @@
 //     return 0;
 // }
 
-Mint::RuntimeContext g_runtime_global_context;
+extern Mint::RuntimeGlobalContext Mint::g_runtime_global_context;
 extern std::shared_ptr<Mint::Application> Mint::CreateApplication();
 
 int main() {
-    g_runtime_global_context.m_application = Mint::CreateApplication();
+    Mint::g_runtime_global_context.m_application = Mint::CreateApplication();
+    Mint::g_runtime_global_context.startSystems();
+    Mint::LOG_INFO("Application created.");
     std::cout << "Mint Engine initialized!" << std::endl;
-    g_runtime_global_context.m_application->Run();
+    Mint::g_runtime_global_context.m_application->Run();
     return 0;
 }
