@@ -1,5 +1,7 @@
-- Entry Point (？ 启动游戏或引擎时发生的事？)
-- Aplication Layer (应用的生命周期与事件, 运行循环, 时间变化等)
+- Entry Point -> done
+- Event System
+  - 
+
 - Window Layer (我认为应该划入render system内, 不过先于render)
   - Input   ↓
   - Events  ←
