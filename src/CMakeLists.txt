@@ -27,6 +27,10 @@ add_library(${TARGET_NAME} STATIC
 # test?
 add_subdirectory(3rdparty)
 
+target_include_directories(${TARGET_NAME}
+    PUBLIC
+        ${ENGINE_ROOT_DIR}
+)
 
 # link dependencies
 target_link_libraries(${TARGET_NAME}
