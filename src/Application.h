@@ -2,6 +2,7 @@
 
 #include <memory>
 #include "event/event_system.h"
+#include "render/window_system.h"
 
 namespace Mint {
 
@@ -11,6 +12,10 @@ namespace Mint {
         virtual ~Application();
 
         void Run();
+
+    private:
+        std::unique_ptr<Window> m_window;
+        bool m_running = true;
     };
 
     // to be defined in client

@@ -38,7 +38,12 @@ add_executable(Mint sandbox.cpp)
 # 添加源文件到可执行文件
 # target_sources(Mint PUBLIC ${sources})
 
-target_include_directories(Mint PUBLIC "${SOURCE_DIR}")
+target_include_directories(Mint 
+    PUBLIC 
+        "${SOURCE_DIR}"
+        "${SOURCE_DIR}/platform/windows"
+        "${SOURCE_DIR}/render"
+)
 target_link_libraries(Mint PUBLIC MintRuntime)
 
 

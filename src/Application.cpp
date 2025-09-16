@@ -13,9 +13,9 @@ namespace Mint {
     }
 
     void Application::Run() {
-        WindowResizeEvent e(1280, 720);
-        LOG_INFO(e.ToString());
-        while(true) {
+        m_window = std::unique_ptr<Window>(Window::Create(WindowCreateInfo()));
+        while(m_running) {
+            m_window->OnUpdate();
         }
     }
 

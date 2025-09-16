@@ -39,5 +39,5 @@ target_link_libraries(${TARGET_NAME}
         # glm::glm
         # glad::glad
         # imgui::imgui
-        # glfw
+        glfw
 )

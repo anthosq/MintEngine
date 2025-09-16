@@ -18,6 +18,12 @@
 #define LOG_ERROR(...) LOG_HELPER(Mint::LogSystem::LogLevel::error, __VA_ARGS__)
 #define LOG_FATAL(...) LOG_HELPER(Mint::LogSystem::LogLevel::fatal, __VA_ARGS__)
 
+#ifdef MT_ENABLE_ASSERTS
+    #define MT_ASSERT(x, ...) { if(!(x)) { LOG_ERROR(__VA_ARGS__); } }
+#else
+    #define MT_ASSERT(x, ...)
+#endif
+
 // ---------------------------------------------------
 namespace Mint {
     class LogSystem {
