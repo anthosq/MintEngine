@@ -12,15 +12,15 @@ extern Mint::RuntimeGlobalContext Mint::g_runtime_global_context;
 extern std::shared_ptr<Mint::Application> Mint::CreateApplication();
 
 int main() {
-    Mint::g_runtime_global_context.m_application = Mint::CreateApplication();
     Mint::g_runtime_global_context.startSystems();
-    Mint::LOG_INFO("Application created.");
-    Mint::LOG_WARN("This is a warning message.");
-    Mint::LOG_ERROR("This is an error message.");
-    Mint::LOG_DEBUG("This is a debug message.");
-    Mint::LOG_FATAL("This is a fatal message.");
+    Mint::g_runtime_global_context.m_application = Mint::CreateApplication();
+    // Mint::LOG_INFO("Application created.");
+    // Mint::LOG_WARN("This is a warning message.");
+    // Mint::LOG_ERROR("This is an error message.");
+    // Mint::LOG_DEBUG("This is a debug message.");
+    // Mint::LOG_FATAL("This is a fatal message.");
+    Mint::LOG_INFO("Mint Engine started.");
 
-    std::cout << "Mint Engine initialized!" << std::endl;
     Mint::g_runtime_global_context.m_application->Run();
     return 0;
 }

@@ -12,4 +12,13 @@ namespace Mint {
     
     }
 
+    void RuntimeGlobalContext::shutdownSystems() {
+        if (m_application) {
+            m_application.reset();
+            LOG_INFO("Application shut down.");
+        }
+        m_log_system.reset();
+        LOG_INFO("Log system shut down.");
+    }
+
 }

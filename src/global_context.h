@@ -16,6 +16,7 @@ namespace Mint {
     */
     public:
     void startSystems();
+    void shutdownSystems();
 
     public:
         // possible global systems: logger, input, file, config, asset, world, physics
