@@ -1,6 +1,7 @@
 #pragma once
 
-#include "src/global_context.h"
+#include "global_context.h"
+#include "Application.h"
 
 // int main(int argc, char** argv) {
 //     g_runtime_global_context.m_application = std::make_shared<Mint::Application>();

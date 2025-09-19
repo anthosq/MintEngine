@@ -20,14 +20,24 @@ namespace Mint {
 
     void Application::OnEvent(Event& e) {
         EventDispatcher dispatcher(e);
+        LOG_INFO(fmt::format("Event: {0}", e.ToString()));
         dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose));
+
+        for (auto it = m_layer_stack.end(); it != m_layer_stack.begin(); ) {
+            (*--it)->OnEvent(e);
+            if (e.IsHandled()) {
+                break;
+            }
+        }
     }
 
     void Application::Run() {
-        while(m_running) {
+        while (m_running) {
+            for (Layer* layer : m_layer_stack) {
+                layer->OnUpdate();
+            }
             m_window->OnUpdate();
         }
-
         g_runtime_global_context.shutdownSystems();
     }
 

@@ -43,6 +43,7 @@ target_include_directories(Mint
         "${SOURCE_DIR}"
         "${SOURCE_DIR}/platform/windows"
         "${SOURCE_DIR}/render"
+        "${SOURCE_DIR}/event"
 )
 target_link_libraries(Mint PUBLIC MintRuntime)
 

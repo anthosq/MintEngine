@@ -3,6 +3,7 @@
 #include <functional>
 // TODO: 考虑移除对 <string> 的依赖, 使用自定义的字符串类
 #include <string>
+#include <sstream>
 
 
 namespace Mint {
@@ -31,7 +32,7 @@ namespace Mint {
     virtual int GetCategoryFlags() const override { return category; }
 
 #define EVENT_CLASS_TYPE(type) \
-    static EventType GetStaticType() { return EventType::##type; } \
+    static EventType GetStaticType() { return EventType::type; } \
     virtual EventType GetEventType() const override { return GetStaticType(); } \
     virtual const char* GetName() const override { return #type; }
 
@@ -48,6 +49,8 @@ namespace Mint {
             bool IsInCategory(EventCategory category) {
                 return GetCategoryFlags() & category;
             }
+
+            bool IsHandled() const { return m_Handled; }
 
         protected:
             bool m_Handled = false; 
