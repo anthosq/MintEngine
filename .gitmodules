@@ -4,3 +4,6 @@
 [submodule "src/3rdparty/glfw"]
 	path = src/3rdparty/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "src/3rdparty/imgui"]
+	path = src/3rdparty/imgui
+	url = https://github.com/ocornut/imgui.git

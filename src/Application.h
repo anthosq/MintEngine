@@ -15,14 +15,17 @@ namespace Mint {
         void Run();
         void OnEvent(Event& e);
 
-        void PushLayer(Layer* layer) { m_layer_stack.PushLayer(layer); }
-        void PushOverlay(Layer* overlay) { m_layer_stack.PushOverlay(overlay); }
+        void PushLayer(Layer* layer);
+        void PushOverlay(Layer* overlay);
+        inline Window& GetWindow() { return *m_window; }
+        inline static Application& GetInstance() { return *s_instance; }
 
     private:
         bool OnWindowClose(WindowCloseEvent& e);
         std::unique_ptr<Window> m_window;
         bool m_running = true;
         LayerStack m_layer_stack;
+        static Application* s_instance;
     };
 
     // to be defined in client

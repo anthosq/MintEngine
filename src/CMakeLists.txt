@@ -12,6 +12,9 @@ set(THIRD_PARTY_DIR "${ENGINE_ROOT_DIR}/3rdparty")
 file(GLOB_RECURSE HEADER_FILES "*.h")
 file(GLOB_RECURSE SOURCE_FILES "*.cpp")
 
+list(FILTER HEADER_FILES EXCLUDE REGEX "3rdparty/.*")
+list(FILTER SOURCE_FILES EXCLUDE REGEX "3rdparty/.*")
+
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
     ${HEADER_FILES}
@@ -30,14 +33,14 @@ add_subdirectory(3rdparty)
 target_include_directories(${TARGET_NAME}
     PUBLIC
         ${ENGINE_ROOT_DIR}
+        ${ENGINE_ROOT_DIR}/3rdparty
 )
 
 # link dependencies
 target_link_libraries(${TARGET_NAME}
     PUBLIC
         spdlog::spdlog
-        # glm::glm
-        # glad::glad
-        # imgui::imgui
+        imgui
         glfw
+        glad
 )

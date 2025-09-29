@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../render/window_system.h"
-#include <GLFW/glfw3.h>
+#include <glad/glad.h>
 #include <string>
 #include <array>
 
@@ -15,7 +15,8 @@ namespace Mint {
 
             void OnUpdate() override;
 
-            std::array<unsigned int, 2> GetWindowSize() const override;
+            unsigned int GetWidth() const override { return m_data.width; }
+            unsigned int GetHeight() const override { return m_data.height; }
 
             // Window attributes
             void SetEventCallback(const EventCallbackFn& callback) override;
@@ -25,7 +26,7 @@ namespace Mint {
             bool getFocusMode() const override;
             void setFocusMode(bool is_focus) override;
 
-            virtual GLFWwindow* GetWindow() const { return m_window; }
+            virtual void* GetNativeWindow() const { return m_window; }
 
             private:
                 virtual void Init(const WindowCreateInfo& create_info);
