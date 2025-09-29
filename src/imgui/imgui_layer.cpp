@@ -15,9 +15,6 @@ namespace Mint {
         : Layer("ImGuiLayer") {
     }
 
-    ImGuiLayer::~ImGuiLayer() {
-    }
-
     void ImGuiLayer::OnAttach() {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -28,52 +25,83 @@ namespace Mint {
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
         
+        ImGui::StyleColorsDark();
+        
+        ImGuiStyle& style = ImGui::GetStyle();
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+            style.WindowRounding = 0.0f;
+            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+        }
 
-        GLFWwindow *window = glfwGetCurrentContext();
+        Application& app = Application::GetInstance();
+        GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
+
         if (!window) {
             LOG_ERROR("No current OpenGL context for ImGui!");
             return;
         }
+
         ImGui_ImplGlfw_InitForOpenGL(window, true);
-        io.DisplaySize = ImVec2((float)1920, (float)1080);
-
-        // ImGui更新, 新版本ImGui后端只需要io.addKeyEvent()报告事件, 不再需要io.KeyMap[]
         ImGui_ImplOpenGL3_Init("#version 330");
-        LOG_INFO("ImGuiLayer attached.");
-
     }
 
     void ImGuiLayer::OnDetach() {
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
     }
 
-    void ImGuiLayer::OnUpdate() {
-        // temporary delta time
+    // void ImGuiLayer::OnUpdate() {
+    //     // temporary delta time
+    //     ImGuiIO& io = ImGui::GetIO(); 
+    //     Application& app = Application::GetInstance();
+    //     io.DisplaySize = ImVec2(app.GetWindow().GetWidth(), app.GetWindow().GetHeight());
+
+    //     float time = (float)glfwGetTime();
+    //     io.DeltaTime = m_last_time > 0.0 ? (time - m_last_time) : (1.0f / 60.0f);
+    //     m_last_time = time;
+
+    //     ImGui_ImplGlfw_NewFrame();
+    //     ImGui_ImplOpenGL3_NewFrame();
+    //     ImGui::NewFrame();
+
+    //     static bool show = true;
+    //     ImGui::ShowDemoWindow(&show);
+
+    //     ImGui::Render();
+    //     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    // }
+
+    void ImGuiLayer::OnEvent(Event& event) {
+
+    }
+
+    void ImGuiLayer::Begin() {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+    }
+
+    void ImGuiLayer::End() {
         ImGuiIO& io = ImGui::GetIO(); 
         Application& app = Application::GetInstance();
         io.DisplaySize = ImVec2(app.GetWindow().GetWidth(), app.GetWindow().GetHeight());
 
-        float time = (float)glfwGetTime();
-        io.DeltaTime = m_last_time > 0.0 ? (time - m_last_time) : (1.0f / 60.0f);
-        m_last_time = time;
-
-        ImGui_ImplGlfw_NewFrame();
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui::NewFrame();
-
-        static bool show = true;
-        ImGui::ShowDemoWindow(&show);
-
+        // Rendering
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+            GLFWwindow* backup_current_context = glfwGetCurrentContext();
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+            glfwMakeContextCurrent(backup_current_context);
+        }
     }
 
-    void ImGuiLayer::OnEvent(Event& event) {
-    }
-
-    void ImGuiLayer::Begin() {
-    }
-
-    void ImGuiLayer::End() {
+    void ImGuiLayer::OnImGuiRender() {
+        static bool show = true;
+        ImGui::ShowDemoWindow(&show);
     }
 
     

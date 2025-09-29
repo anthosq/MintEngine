@@ -13,6 +13,9 @@ namespace Mint {
             virtual void OnUpdate() {}
             virtual void OnEvent(Event& event) {}
 
+            // Not sure if we need this function
+            virtual void OnImGuiRender() {}
+
             inline const std::string& GetName() const { return m_debug_name; }
 
         protected:

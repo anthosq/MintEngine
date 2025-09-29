@@ -27,8 +27,7 @@ class Sandbox : public Mint::Application {
 public:
     Sandbox() {
         PushLayer(new ExampleLayer());
-        PushOverlay(new Mint::ImGuiLayer());
-
+        // PushOverlay(new Mint::ImGuiLayer());
     };
     ~Sandbox() override = default;
 };

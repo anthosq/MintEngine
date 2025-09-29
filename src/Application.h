@@ -5,6 +5,7 @@
 #include "event/event_system.h"
 #include "render/window_system.h"
 #include "event/application_event.h"
+#include "imgui/imgui_layer.h"
 
 namespace Mint {
     class Application { 
@@ -23,6 +24,7 @@ namespace Mint {
     private:
         bool OnWindowClose(WindowCloseEvent& e);
         std::unique_ptr<Window> m_window;
+        ImGuiLayer* m_imgui_layer;
         bool m_running = true;
         LayerStack m_layer_stack;
         static Application* s_instance;

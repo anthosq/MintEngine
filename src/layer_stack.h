@@ -8,7 +8,7 @@
 namespace Mint {
     class LayerStack {
         public:
-            LayerStack();
+            LayerStack() = default;
             ~LayerStack();
 
             void PushLayer(Layer* layer);
@@ -26,6 +26,6 @@ namespace Mint {
 
         private:
             std::vector<Layer*> m_layers;
-            std::vector<Layer*>::iterator m_layer_insert;
+            unsigned int m_layer_insert_index = 0;
     };
 }

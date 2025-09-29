@@ -17,6 +17,9 @@ namespace Mint {
         // 所以成员指针需要使用std::bind创一个新的可调用对象
         // 或者使用lambda [this](Event& e) { this->OnEvent(e); }
         m_window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
+        // 所有权问题, 小心处理
+        m_imgui_layer = new ImGuiLayer();
+        PushOverlay(m_imgui_layer);
     }
 
     Application::~Application() {
@@ -39,12 +42,19 @@ namespace Mint {
         while (m_running) {
             glClearColor(1, 1, 1, 1);
             glClear(GL_COLOR_BUFFER_BIT);
+
             for (Layer* layer : m_layer_stack) {
                 layer->OnUpdate();
-
-                // auto [x,y] = Input::GetMousePosition();
-                // LOG_INFO(fmt::format("Mouse Position: ({0}, {1})", x, y));
             }
+
+            // On the render
+            m_imgui_layer->Begin();
+            for (Layer* layer : m_layer_stack) {
+                layer->OnImGuiRender();
+            }
+            m_imgui_layer->End();
+            // auto [x,y] = Input::GetMousePosition();
+            // LOG_INFO(fmt::format("Mouse Position: ({0}, {1})", x, y));
             m_window->OnUpdate();
         }
         g_runtime_global_context.shutdownSystems();

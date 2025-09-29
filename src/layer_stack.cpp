@@ -2,9 +2,6 @@
 
 
 namespace Mint {
-    LayerStack::LayerStack() {
-        m_layer_insert = m_layers.begin();
-    }
 
     LayerStack::~LayerStack() {
         for (Layer* layer : m_layers) {
@@ -14,7 +11,8 @@ namespace Mint {
     }
 
     void LayerStack::PushLayer(Layer* layer) {
-    m_layer_insert = m_layers.emplace(m_layer_insert, layer);
+        m_layers.emplace(m_layers.begin() + m_layer_insert_index, layer);
+        m_layer_insert_index++;
     }
 
     // 确保Overlay在最上层
@@ -23,19 +21,19 @@ namespace Mint {
     }
 
     void LayerStack::PopLayer(Layer* layer) {
-        auto it = std::find(m_layers.begin(), m_layers.end(), layer);
-        if (it != m_layers.end()) {
+        auto it = std::find(m_layers.begin(), m_layers.begin() + m_layer_insert_index, layer);
+        if (it != m_layers.begin() + m_layer_insert_index) {
             layer->OnDetach();
             m_layers.erase(it);
-            m_layer_insert--;
+            m_layer_insert_index--;
         }
     }
 
-    void LayerStack::PopOverlay(Layer* Overlay) {
-        auto it = std::find(m_layers.begin(), m_layers.end(), Overlay);
+    void LayerStack::PopOverlay(Layer* overlay) {
+        auto it = std::find(m_layers.begin() + m_layer_insert_index, m_layers.end(), overlay);
         if (it != m_layers.end()) {
-            Overlay->OnDetach();
+            overlay->OnDetach();
             m_layers.erase(it);
         }
     }
-}
+} 

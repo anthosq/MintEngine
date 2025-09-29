@@ -14,12 +14,13 @@ namespace Mint {
 
             virtual void OnEvent(Event& event) override;
 
+            // ImGUI层不采用OnUpdate形式更新, 因为可能其他层也需要绘制ImGui
+            // 因此采用Begin/End形式进行管理
             void Begin();
             void End();
 
+            virtual void OnImGuiRender() override;
 
         private:
-            // temporary
-            float m_last_time = 0.0f;
     };
 }
