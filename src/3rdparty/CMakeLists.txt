@@ -29,3 +29,8 @@ if(NOT TARGET glad)
     include(glad.cmake)
     set_target_properties(glad PROPERTIES FOLDER ${third_party_dir}/glad)
 endif()
+
+if(NOT TARGET glm)
+    add_subdirectory(glm)
+    set_target_properties(glm PROPERTIES FOLDER ${third_party_dir}/glm)
+endif()

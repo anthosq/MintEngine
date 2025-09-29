@@ -43,4 +43,5 @@ target_link_libraries(${TARGET_NAME}
         imgui
         glfw
         glad
+        glm
 )

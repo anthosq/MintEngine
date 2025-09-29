@@ -2,6 +2,7 @@
 #include <memory>
 #include "log_system.h"
 #include "input.h"
+#include <glm/glm.hpp>
 
 namespace Mint {
 

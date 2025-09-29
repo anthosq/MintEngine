@@ -7,16 +7,17 @@ namespace Mint {
     class ImGuiLayer : public Layer {
         public:
             ImGuiLayer();
-            ~ImGuiLayer() override;
+            ~ImGuiLayer() = default;
 
-            void OnAttach() override;
-            void OnDetach() override;
+            virtual void OnAttach() override;
+            virtual void OnDetach() override;
 
-            void OnUpdate() override;
-            void OnEvent(Event& event) override;
+            virtual void OnEvent(Event& event) override;
 
             void Begin();
             void End();
+
+
         private:
             // temporary
             float m_last_time = 0.0f;
