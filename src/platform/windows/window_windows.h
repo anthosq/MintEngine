@@ -1,10 +1,12 @@
 #pragma once
 
+// TODO: 需要修正路径问题
 #include "../../render/window_system.h"
-#include <glad/glad.h>
+#include "../../render/graphics_context.h"
+#include "../../render/gl_common.h"
+
 #include <string>
 #include <array>
-
 
 namespace Mint {
 
@@ -42,7 +44,9 @@ namespace Mint {
                     bool m_is_focus {false};
                     EventCallbackFn event_callback;
                 };
-                
+
+                GraphicContext* m_context {nullptr};
+
                 GLFWwindow* m_window {nullptr};
                 WindowData m_data;
 

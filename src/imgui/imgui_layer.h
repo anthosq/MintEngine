@@ -1,6 +1,10 @@
 #pragma once
 #include "layer.h"
 
+// 临时添加
+#include <imgui.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+#include <imgui/backends/imgui_impl_glfw.h>
 
 namespace Mint {
 

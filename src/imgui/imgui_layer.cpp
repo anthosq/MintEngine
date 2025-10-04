@@ -1,14 +1,10 @@
 #include "imgui_layer.h"
 #include "Application.h"
 
-// 临时添加
-#include <imgui.h>
-#include <imgui/backends/imgui_impl_opengl3.h>
-#include <imgui/backends/imgui_impl_glfw.h>
-#include <glfw/glfw3.h>
+// TODO: 需要修正路径问题
+#include "../render/gl_common.h"
 #include "log_system.h"
 // -----------------    
-
 
 namespace Mint {
     ImGuiLayer::ImGuiLayer()

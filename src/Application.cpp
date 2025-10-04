@@ -4,6 +4,9 @@
 #include "input.h"
 #include <glm/glm.hpp>
 
+// 临时头文件, 后续需要将clear部分转移
+#include "./render/gl_common.h"
+
 namespace Mint {
 
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
@@ -40,8 +43,9 @@ namespace Mint {
 
     void Application::Run() {
         while (m_running) {
+            // Actually happening in frame buffer
             glClearColor(1, 1, 1, 1);
-            glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             for (Layer* layer : m_layer_stack) {
                 layer->OnUpdate();

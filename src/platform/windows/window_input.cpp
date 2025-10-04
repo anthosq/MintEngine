@@ -1,6 +1,8 @@
 #include "window_input.h"
 
 #include "Application.h"
+#include "../../render/gl_common.h"
+
 namespace Mint {
     
     Input *Input::s_Instance = new WindowInput();

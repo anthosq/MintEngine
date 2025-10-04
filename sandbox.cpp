@@ -21,6 +21,12 @@ public:
 
         }
     }
+
+    void OnImGuiRender() override {
+        ImGui::Begin("Test");
+        ImGui::Text("Hello from ImGui!");
+        ImGui::End();
+    }
 };
 
 class Sandbox : public Mint::Application {
