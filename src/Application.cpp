@@ -1,5 +1,4 @@
 #include "Application.h"
-#include <memory>
 #include "log_system.h"
 #include "input.h"
 #include <glm/glm.hpp>
@@ -23,6 +22,81 @@ namespace Mint {
         // 所有权问题, 小心处理
         m_imgui_layer = new ImGuiLayer();
         PushOverlay(m_imgui_layer);
+
+        // -------------临时------------------
+        // Prepare something for render
+        // Vertex Array
+        // Index Buffer
+
+
+        glGenVertexArrays(1, &m_vertex_array);
+        glBindVertexArray(m_vertex_array);
+
+        float vertices[3 * 7] = {
+            -0.5f, -0.5f, 0.0f, 0.8f, 0.0f, 0.0f, 1.0f,
+             0.5f, -0.5f, 0.0f, 0.2f, 0.8f, 0.0f, 1.0f,
+             0.0f,  0.5f, 0.0f, 0.1f, 0.1f, 0.8f, 1.0f
+        };
+
+        m_vertex_buffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
+
+        {      
+            BufferLayout layout = {
+                { ShaderDataType::Float3, "a_position" },
+                { ShaderDataType::Float4, "a_color" }
+            };
+            m_vertex_buffer->SetLayout(layout);
+        }
+        
+        uint32_t index = 0;
+        // buffer layout
+        for (auto const& element: m_vertex_buffer->GetLayout()) {
+            glEnableVertexAttribArray(index);
+            glVertexAttribPointer(index, 
+                element.GetComponentCount(),
+                GetOpenGLDataType(element.type),
+                element.normalized ? GL_TRUE : GL_FALSE,
+                m_vertex_buffer->GetLayout().GetStride(),
+                (const void*)element.offset);
+            index++;
+        }
+
+
+        // index buffer
+        unsigned int indices[3] = { 0, 1, 2 };
+        m_index_buffer.reset(IndexBuffer::Create(indices, 3));
+
+
+        std::string vertex_src = R"(
+            #version 330 core
+
+            layout(location = 0) in vec3 a_position;
+            layout(location = 1) in vec4 a_color;
+
+            out vec3 v_position;
+            out vec4 v_color;
+            void main()
+            {
+                v_position = a_position;
+                v_color = a_color;
+                gl_Position = vec4(a_position, 1.0);
+            }
+        )";
+        std::string fragment_src = R"(
+            #version 330 core
+
+            layout(location = 0) out vec4 color;
+
+            in vec3 v_position;
+            in vec4 v_color;
+
+            void main()
+            {
+                color = vec4(v_position * 0.5 + 0.5, 1.0);
+            }
+        )";
+        m_shader = std::make_unique<Shader>(vertex_src, fragment_src);
+        // ---------------------------------
     }
 
     Application::~Application() {
@@ -44,8 +118,14 @@ namespace Mint {
     void Application::Run() {
         while (m_running) {
             // Actually happening in frame buffer
-            glClearColor(1, 1, 1, 1);
+            glClearColor(0.1f, 0.1f, 0.1f, 1);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            m_shader->Bind();
+            glBindVertexArray(m_vertex_array);
+            glDrawElements(GL_TRIANGLES, m_index_buffer->GetCount(), GL_UNSIGNED_INT, nullptr);
+
+
 
             for (Layer* layer : m_layer_stack) {
                 layer->OnUpdate();
@@ -62,6 +142,7 @@ namespace Mint {
             m_window->OnUpdate();
         }
         g_runtime_global_context.shutdownSystems();
+        
     }
 
     bool Application::OnWindowClose(WindowCloseEvent& e) {

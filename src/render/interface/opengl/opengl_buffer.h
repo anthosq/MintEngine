@@ -1,0 +1,40 @@
+#pragma once
+#include <cstdint>
+#include "render/buffer.h"
+#include "../../gl_common.h"
+
+namespace Mint {
+    class OpenGLVertexBuffer : public VertexBuffer {
+    public:
+        OpenGLVertexBuffer(uint32_t size);
+        OpenGLVertexBuffer(float* vertices, uint32_t size);
+        virtual ~OpenGLVertexBuffer();
+
+        virtual const BufferLayout& GetLayout() const override { return m_layout; }
+        virtual void SetLayout(const BufferLayout& layout) override { m_layout = layout; }
+
+        virtual void SetData(const void* data, uint32_t size) override;
+
+        void Bind() const override;
+        void Unbind() const override;
+
+    private:
+        uint32_t m_renderer_id;
+        BufferLayout m_layout;
+    };
+
+    class OpenGLIndexBuffer : public IndexBuffer {
+    public:
+        OpenGLIndexBuffer(uint32_t *indices, uint32_t count);
+        virtual ~OpenGLIndexBuffer();
+
+        void Bind() const;
+        void Unbind() const;
+
+        uint32_t GetCount() const { return m_count; }
+
+    private:
+        uint32_t m_renderer_id;
+        uint32_t m_count;
+    };
+}
