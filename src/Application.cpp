@@ -4,7 +4,6 @@
 #include <glm/glm.hpp>
 
 // 临时头文件, 后续需要将clear部分转移
-#include "./render/gl_common.h"
 
 namespace Mint {
 
@@ -28,45 +27,34 @@ namespace Mint {
         // Vertex Array
         // Index Buffer
 
+        m_vertex_array.reset(VertexArray::Create());
 
-        glGenVertexArrays(1, &m_vertex_array);
-        glBindVertexArray(m_vertex_array);
-
-        float vertices[3 * 7] = {
+        float vertices[4 * 7] = {
             -0.5f, -0.5f, 0.0f, 0.8f, 0.0f, 0.0f, 1.0f,
-             0.5f, -0.5f, 0.0f, 0.2f, 0.8f, 0.0f, 1.0f,
-             0.0f,  0.5f, 0.0f, 0.1f, 0.1f, 0.8f, 1.0f
+            -0.5f, 0.5f, 0.0f, 0.2f, 0.8f, 0.0f, 1.0f,
+            0.5f, 0.5f, 0.0f, 0.1f, 0.1f, 0.8f, 1.0f,
+            0.5f, -0.5f, 0.0f, 0.8f, 0.8f, 0.1f, 1.0f
         };
 
+        // vertex buffer
+        std::shared_ptr<VertexBuffer> m_vertex_buffer;
+        std::shared_ptr<IndexBuffer> m_index_buffer;
         m_vertex_buffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
 
-        {      
-            BufferLayout layout = {
-                { ShaderDataType::Float3, "a_position" },
-                { ShaderDataType::Float4, "a_color" }
-            };
-            m_vertex_buffer->SetLayout(layout);
-        }
+        BufferLayout layout = {
+            { ShaderDataType::Float3, "a_position" },
+            { ShaderDataType::Float4, "a_color" }
+        };
+        m_vertex_buffer->SetLayout(layout);
         
-        uint32_t index = 0;
-        // buffer layout
-        for (auto const& element: m_vertex_buffer->GetLayout()) {
-            glEnableVertexAttribArray(index);
-            glVertexAttribPointer(index, 
-                element.GetComponentCount(),
-                GetOpenGLDataType(element.type),
-                element.normalized ? GL_TRUE : GL_FALSE,
-                m_vertex_buffer->GetLayout().GetStride(),
-                (const void*)element.offset);
-            index++;
-        }
-
+        m_vertex_array->AddVertexBuffer(m_vertex_buffer);
 
         // index buffer
-        unsigned int indices[3] = { 0, 1, 2 };
-        m_index_buffer.reset(IndexBuffer::Create(indices, 3));
+        unsigned int indices[6] = { 0, 1, 2, 0, 3, 2 };
+        m_index_buffer.reset(IndexBuffer::Create(indices, 6));
 
-
+        m_vertex_array->SetIndexBuffer(m_index_buffer);
+        // drawing rectangle
         std::string vertex_src = R"(
             #version 330 core
 
@@ -118,13 +106,18 @@ namespace Mint {
     void Application::Run() {
         while (m_running) {
             // Actually happening in frame buffer
-            glClearColor(0.1f, 0.1f, 0.1f, 1);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            // RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
+            // RenderCommand::Clear();
 
+            RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
+            RenderCommand::Clear();
+
+            RenderSystem::BeginScene();
+            // Render::Flush();
             m_shader->Bind();
-            glBindVertexArray(m_vertex_array);
-            glDrawElements(GL_TRIANGLES, m_index_buffer->GetCount(), GL_UNSIGNED_INT, nullptr);
+            RenderSystem::Submit(m_vertex_array);
 
+            RenderSystem::EndScene();
 
 
             for (Layer* layer : m_layer_stack) {

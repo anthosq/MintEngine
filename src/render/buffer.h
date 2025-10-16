@@ -1,7 +1,7 @@
 #pragma once
-#include "precompile.h"
 
-#include "render_system.h"
+#include <vector>
+#include <string>
 #include "gl_common.h"
 
 namespace Mint {

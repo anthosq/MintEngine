@@ -10,6 +10,8 @@
 #include "render/interface/opengl/opengl_shader.h"
 #include "render/render_system.h"
 #include "render/buffer.h"
+#include "render/vertex_array.h"
+#include "render/render_system.h"
 
 namespace Mint {
     class Application { 
@@ -34,10 +36,8 @@ namespace Mint {
         static Application* s_instance;
 
         // 临时
-        unsigned int m_vertex_array;
-        std::unique_ptr<VertexBuffer> m_vertex_buffer;
-        std::unique_ptr<IndexBuffer> m_index_buffer;
-        std::unique_ptr<Shader> m_shader;
+        std::shared_ptr<VertexArray> m_vertex_array;
+        std::shared_ptr<Shader> m_shader;
     };
 
     // to be defined in client
