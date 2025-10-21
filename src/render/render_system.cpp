@@ -1,5 +1,4 @@
 #include "render/render_system.h"
-#include "render/interface/opengl/opengl_shader.h"
 
 
 namespace Mint {
@@ -13,10 +12,15 @@ namespace Mint {
 
     // 注意, 参考Piccolo的RenderBuffer设计
 
-    void RenderSystem::BeginScene() {
+    //temporary
+    RenderSystem::SceneData* RenderSystem::m_sceneData = new SceneData;
+
+    void RenderSystem::BeginScene(Camera& camera) {
         // Prepare something before rendering
         // environment map, cub map sample, camera...
         // projection view matrix, camera space, light
+
+        m_sceneData->viewProjectionMatrix = camera.GetProjectionMatrix() * camera.GetViewMatrix();
 
     }
 
@@ -24,8 +28,10 @@ namespace Mint {
         // End of rendering
     }
 
-    void RenderSystem::Submit(const std::shared_ptr<VertexArray>& vertex_array) {
+    void RenderSystem::Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertex_array) {
         // not sure
+        shader->Bind();
+        shader->UploadUniformMat4("u_ViewProjection", m_sceneData->viewProjectionMatrix);
         vertex_array->Bind();
         RenderCommand::DrawIndexed(vertex_array);
     }

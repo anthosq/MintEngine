@@ -7,12 +7,16 @@
 #include "event/application_event.h"
 #include "imgui/imgui_layer.h"
 
-#include "render/interface/opengl/opengl_shader.h"
+#include "render/shader.h"
 #include "render/render_system.h"
 #include "render/buffer.h"
 #include "render/vertex_array.h"
 #include "render/render_system.h"
 
+#include "render/camera.h"
+#include "core/time_step.h"
+
+#include <chrono>
 namespace Mint {
     class Application { 
     public:
@@ -27,6 +31,8 @@ namespace Mint {
         inline Window& GetWindow() { return *m_window; }
         inline static Application& GetInstance() { return *s_instance; }
 
+        float CalculateDeltaTime();
+
     private:
         bool OnWindowClose(WindowCloseEvent& e);
         std::unique_ptr<Window> m_window;
@@ -34,10 +40,9 @@ namespace Mint {
         bool m_running = true;
         LayerStack m_layer_stack;
         static Application* s_instance;
+        // float m_last_tick_time = 0.0f;
+        std::chrono::steady_clock::time_point m_last_tick_time = std::chrono::steady_clock::now();
 
-        // 临时
-        std::shared_ptr<VertexArray> m_vertex_array;
-        std::shared_ptr<Shader> m_shader;
     };
 
     // to be defined in client

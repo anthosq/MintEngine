@@ -87,7 +87,7 @@ namespace Mint {
         m_context->Init();
 
 
-        // 考虑后续转移至vulkan, 摆脱这部分hacdcoded opengl依赖
+        // 考虑后续转移至vulkan, 摆脱这部分hardcoded opengl依赖
         // int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
         // MT_ASSERT(status, "Failed to initialize Glad!");
 

@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "Core.h"
 #include "log_system.h"
 #include "input.h"
 #include <glm/glm.hpp>
@@ -6,8 +7,6 @@
 // 临时头文件, 后续需要将clear部分转移
 
 namespace Mint {
-
-#define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
     Application *Application::s_instance = nullptr;
 
@@ -22,69 +21,6 @@ namespace Mint {
         m_imgui_layer = new ImGuiLayer();
         PushOverlay(m_imgui_layer);
 
-        // -------------临时------------------
-        // Prepare something for render
-        // Vertex Array
-        // Index Buffer
-
-        m_vertex_array.reset(VertexArray::Create());
-
-        float vertices[4 * 7] = {
-            -0.5f, -0.5f, 0.0f, 0.8f, 0.0f, 0.0f, 1.0f,
-            -0.5f, 0.5f, 0.0f, 0.2f, 0.8f, 0.0f, 1.0f,
-            0.5f, 0.5f, 0.0f, 0.1f, 0.1f, 0.8f, 1.0f,
-            0.5f, -0.5f, 0.0f, 0.8f, 0.8f, 0.1f, 1.0f
-        };
-
-        // vertex buffer
-        std::shared_ptr<VertexBuffer> m_vertex_buffer;
-        std::shared_ptr<IndexBuffer> m_index_buffer;
-        m_vertex_buffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
-
-        BufferLayout layout = {
-            { ShaderDataType::Float3, "a_position" },
-            { ShaderDataType::Float4, "a_color" }
-        };
-        m_vertex_buffer->SetLayout(layout);
-        
-        m_vertex_array->AddVertexBuffer(m_vertex_buffer);
-
-        // index buffer
-        unsigned int indices[6] = { 0, 1, 2, 0, 3, 2 };
-        m_index_buffer.reset(IndexBuffer::Create(indices, 6));
-
-        m_vertex_array->SetIndexBuffer(m_index_buffer);
-        // drawing rectangle
-        std::string vertex_src = R"(
-            #version 330 core
-
-            layout(location = 0) in vec3 a_position;
-            layout(location = 1) in vec4 a_color;
-
-            out vec3 v_position;
-            out vec4 v_color;
-            void main()
-            {
-                v_position = a_position;
-                v_color = a_color;
-                gl_Position = vec4(a_position, 1.0);
-            }
-        )";
-        std::string fragment_src = R"(
-            #version 330 core
-
-            layout(location = 0) out vec4 color;
-
-            in vec3 v_position;
-            in vec4 v_color;
-
-            void main()
-            {
-                color = vec4(v_position * 0.5 + 0.5, 1.0);
-            }
-        )";
-        m_shader = std::make_unique<Shader>(vertex_src, fragment_src);
-        // ---------------------------------
     }
 
     Application::~Application() {
@@ -103,25 +39,25 @@ namespace Mint {
         }
     }
 
+    float Application::CalculateDeltaTime()
+    {
+        float delta_time;
+        {
+            using namespace std::chrono;
+            steady_clock::time_point tick_time = steady_clock::now();
+            duration<float> time_span = duration_cast<duration<float>>(tick_time - m_last_tick_time);
+            delta_time = time_span.count();
+            m_last_tick_time = tick_time;
+        }
+        return delta_time; 
+    }
+
     void Application::Run() {
+        TimeStep delta_time = CalculateDeltaTime();
+
         while (m_running) {
-            // Actually happening in frame buffer
-            // RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
-            // RenderCommand::Clear();
-
-            RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
-            RenderCommand::Clear();
-
-            RenderSystem::BeginScene();
-            // Render::Flush();
-            m_shader->Bind();
-            RenderSystem::Submit(m_vertex_array);
-
-            RenderSystem::EndScene();
-
-
             for (Layer* layer : m_layer_stack) {
-                layer->OnUpdate();
+                layer->OnUpdate(delta_time);
             }
 
             // On the render
@@ -138,7 +74,9 @@ namespace Mint {
         
     }
 
-    bool Application::OnWindowClose(WindowCloseEvent& e) {
+
+    bool Application::OnWindowClose(WindowCloseEvent &e)
+    {
         m_running = false;
         LOG_INFO("Window close event received, stopping application.");
         return true;

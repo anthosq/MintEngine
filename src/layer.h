@@ -1,6 +1,7 @@
 #pragma once
 
 #include "event/event_system.h"
+#include "core/time_step.h"
 
 namespace Mint {
     class Layer {
@@ -10,7 +11,7 @@ namespace Mint {
 
             virtual void OnAttach() {}
             virtual void OnDetach() {}
-            virtual void OnUpdate() {}
+            virtual void OnUpdate(TimeStep delta_time) {}
             virtual void OnEvent(Event& event) {}
 
             // Not sure if we need this function

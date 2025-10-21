@@ -14,7 +14,7 @@ namespace Mint {
         Camera() = default;
         Camera(const glm::mat4& projection, const glm::mat4& unreserved_z)
             : m_projection_matrix(projection), m_unreserved_z_matrix(unreserved_z) {}
-        Camera(const float deg_fov, const float aspect_ratio, const float zNear, const float zFar);
+        // Camera(const float deg_fov, const float aspect_ratio, const float zNear, const float zFar);
         virtual ~Camera() = default;
 
         glm::mat4 GetProjectionMatrix() const { return m_projection_matrix; }
@@ -42,13 +42,36 @@ namespace Mint {
 
         // not sure
         float GetExposure() const { return m_exposure; }
-    
+        
+
+        // temporary functinos, later move to editor camera
+        const glm::vec3 GetPosition() const { return m_position; }
+        void SetPosition(const glm::vec3& position) { m_position = position; RecalculateViewMatrix(); }
+
+        float GetRotation() const { return m_rotation; }
+        void SetRotation_deg(const float rotation) { m_rotation = rotation; RecalculateViewMatrix(); }
+        // void SetRotation_rad(const float rotation) { m_rotation = rotation; }
+        const glm::mat4& GetViewMatrix() const { return m_view_matrix; }
+        Camera(float left, float right, float bottom, float top) 
+        {
+            m_projection_matrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
+            m_unreserved_z_matrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
+        }
+        // --------------------------------------------------
+
     protected:
         float m_exposure = 0.8f;
 
     private:
+        void RecalculateViewMatrix();
         glm::mat4 m_projection_matrix = glm::mat4(1.0f);
         // UnReserved Z
         glm::mat4 m_unreserved_z_matrix = glm::mat4(1.0f); 
+
+
+        // temporary variables & functions, later move to editor camera
+        glm::vec3 m_position = {0.0f, 0.0f, 0.0f};
+        glm::mat4 m_view_matrix = glm::mat4(1.0f);
+        float m_rotation = 0.0f;
     };
 }

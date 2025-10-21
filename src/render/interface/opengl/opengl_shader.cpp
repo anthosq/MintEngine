@@ -2,10 +2,10 @@
 #include <string>
 #include <vector>
 #include "../../../log_system.h"
-#include "../../gl_common.h"
+#include <glm/gtc/type_ptr.hpp>
 
 namespace Mint {
-    Shader::Shader(const std::string& vertex_src, const std::string& fragment_src) {
+    OpenGLShader::OpenGLShader(const std::string& vertex_src, const std::string& fragment_src) {
         // Create an empty vertex shader handle
         GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
@@ -111,15 +111,21 @@ namespace Mint {
         glDetachShader(program, fragmentShader);
     }
 
-    Shader::~Shader() {
+    OpenGLShader::~OpenGLShader() {
         glDeleteProgram(m_renderer_id);
     }
 
-    void Shader::Bind() const {
+    void OpenGLShader::Bind() const {
         glUseProgram(m_renderer_id);
     }
 
-    void Shader::Unbind() const {
+    void OpenGLShader::Unbind() const {
         glUseProgram(0);
+    }
+
+    void OpenGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix) {
+        glUseProgram(m_renderer_id);
+        GLint Location = glGetUniformLocation(m_renderer_id, name.c_str());
+        glUniformMatrix4fv(Location, 1, GL_FALSE, glm::value_ptr(matrix));
     }
 }
