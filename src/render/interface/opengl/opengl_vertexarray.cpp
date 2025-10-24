@@ -17,7 +17,7 @@ namespace Mint {
         glBindVertexArray(0);
     }
 
-    void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vertex_buffer) {
+    void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertex_buffer) {
         glBindVertexArray(m_renderer_id);
         vertex_buffer->Bind();
         uint32_t index = 0;
@@ -35,7 +35,7 @@ namespace Mint {
         m_vertexBuffers.push_back(vertex_buffer);
     }
 
-    void OpenGLVertexArray::SetIndexBuffer(const std::shared_ptr<IndexBuffer>& index_buffer) {
+    void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& index_buffer) {
 
         glBindVertexArray(m_renderer_id);
         index_buffer->Bind();

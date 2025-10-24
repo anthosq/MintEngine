@@ -22,8 +22,8 @@ namespace Mint {
         // possible global systems: logger, input, file, config, asset, world, physics
         // render, particle, debugdraw, render_debug_config ...
 
-        std::shared_ptr<Application> m_application;
-        std::shared_ptr<LogSystem> m_log_system;
+        Ref<Mint::Application> m_application;
+        Ref<Mint::LogSystem> m_log_system;
 
     };
 

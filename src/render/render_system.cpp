@@ -28,10 +28,12 @@ namespace Mint {
         // End of rendering
     }
 
-    void RenderSystem::Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertex_array) {
+    void RenderSystem::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transform) {
         // not sure
         shader->Bind();
-        shader->UploadUniformMat4("u_ViewProjection", m_sceneData->viewProjectionMatrix);
+        shader->SetMat4("u_ViewProjection", m_sceneData->viewProjectionMatrix);
+        // Model matrix
+        shader->SetMat4("u_Transform", transform);
         vertex_array->Bind();
         RenderCommand::DrawIndexed(vertex_array);
     }

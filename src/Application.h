@@ -16,6 +16,8 @@
 #include "render/camera.h"
 #include "core/time_step.h"
 
+#include "Core.h"
+
 #include <chrono>
 namespace Mint {
     class Application { 
@@ -46,6 +48,6 @@ namespace Mint {
     };
 
     // to be defined in client
-    std::shared_ptr<Application> CreateApplication();
+    Ref<Application> CreateApplication();
 
 }

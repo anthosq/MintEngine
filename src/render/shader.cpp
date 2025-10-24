@@ -6,7 +6,7 @@ namespace Mint {
     Shader* Shader::Create(const std::string &vertex_src, const std::string &fragment_src) {
         switch (RendererAPI::GetAPI()) {
             case RendererAPI::API::None:            return nullptr;
-            case RendererAPI::API::OpenGL:          return OpenGLShader::Create(vertex_src, fragment_src);
+            case RendererAPI::API::OpenGL:          return new OpenGLShader(vertex_src, fragment_src);
         }
 
         return nullptr;

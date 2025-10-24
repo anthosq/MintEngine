@@ -4,7 +4,7 @@
 class ExampleLayer : public Mint::Layer {
 public:
     ExampleLayer() : Layer("Example"), m_camera(-1.6f, 1.6f, -0.9f, 0.9f), // 16:9 纵横比
-                     camera_position(0.0f, 0.0f, 0.0f), camera_rotation(0.0f) { 
+                     camera_position(0.0f, 0.0f, 0.0f), camera_rotation(0.0f), rectangle_transform({0.0f, 0.0f, 0.0f}) { 
         // Mint::LOG_INFO("ExampleLayer::OnAttach");
 
         // -------------临时------------------
@@ -14,20 +14,22 @@ public:
 
         m_vertex_array.reset(Mint::VertexArray::Create());
 
-        float vertices[4 * 7] = {
-            -0.5f, -0.5f, 0.0f, 0.8f, 0.0f, 0.0f, 1.0f,
-            -0.5f, 0.5f, 0.0f, 0.2f, 0.8f, 0.0f, 1.0f,
-            0.5f, 0.5f, 0.0f, 0.1f, 0.1f, 0.8f, 1.0f,
-            0.5f, -0.5f, 0.0f, 0.8f, 0.8f, 0.1f, 1.0f};
+        // adding texture coordinates
+        float vertices[4 * 5] = {
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+            -0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
+             0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+             0.5f, -0.5f, 0.0f, 1.0f, 0.0f};
 
         // vertex buffer
-        std::shared_ptr<Mint::VertexBuffer> m_vertex_buffer;
-        std::shared_ptr<Mint::IndexBuffer> m_index_buffer;
+        Mint::Ref<Mint::VertexBuffer> m_vertex_buffer;
+        Mint::Ref<Mint::IndexBuffer> m_index_buffer;
         m_vertex_buffer.reset(Mint::VertexBuffer::Create(vertices, sizeof(vertices)));
 
         Mint::BufferLayout layout = {
             {Mint::ShaderDataType::Float3, "a_position"},
-            {Mint::ShaderDataType::Float4, "a_color"}};
+            {Mint::ShaderDataType::Float2, "a_texCoord"}
+        };
         m_vertex_buffer->SetLayout(layout);
 
         m_vertex_array->AddVertexBuffer(m_vertex_buffer);
@@ -42,17 +44,16 @@ public:
             #version 330 core
 
             layout(location = 0) in vec3 a_position;
-            layout(location = 1) in vec4 a_color;
 
             uniform mat4 u_ViewProjection;
+            uniform mat4 u_Transform;
 
             out vec3 v_position;
-            out vec4 v_color;
+
             void main()
             {
                 v_position = a_position;
-                v_color = a_color;
-                gl_Position = u_ViewProjection * vec4(a_position, 1.0);
+                gl_Position = u_ViewProjection * u_Transform * vec4(a_position, 1.0);
             }
         )";
         std::string fragment_src = R"(
@@ -61,15 +62,52 @@ public:
             layout(location = 0) out vec4 color;
 
             in vec3 v_position;
-            in vec4 v_color;
+
+            uniform vec4 u_Color;
 
             void main()
             {
-                color = vec4(v_position * 0.5 + 0.5, 1.0);
+                color = u_Color;
+                // color = vec4(v_position * 0.5 + 0.5, 1.0);
             }
         )";
         m_shader.reset(Mint::Shader::Create(vertex_src, fragment_src));
         // ---------------------------------
+        // texture shader
+        std::string texture_shader_vertex_src = R"(
+            #version 330 core
+
+            layout(location = 0) in vec3 a_position;
+            layout(location = 1) in vec2 a_texCoord;
+
+            uniform mat4 u_ViewProjection;
+            uniform mat4 u_Transform;
+
+            out vec2 v_texCoord;
+
+            void main()
+            {
+                v_texCoord = a_texCoord;
+                gl_Position = u_ViewProjection * u_Transform * vec4(a_position, 1.0);
+            }
+        )";
+        std::string texture_shader_fragment_src = R"(
+            #version 330 core
+
+            layout(location = 0) out vec4 color;
+
+            in vec2 v_texCoord;
+
+            uniform sampler2D u_Texture;
+
+            void main()
+            {
+                color = texture(u_Texture, v_texCoord);
+            }
+        )";
+
+        m_texture_shader.reset(Mint::Shader::Create(texture_shader_vertex_src, texture_shader_fragment_src));
+
     }
 
     void OnUpdate(Mint::TimeStep delta_time) override {
@@ -108,9 +146,23 @@ public:
         m_camera.SetPosition(camera_position);
         m_camera.SetRotation_deg(camera_rotation);
 
-
         Mint::RenderSystem::BeginScene(m_camera);
-        Mint::RenderSystem::Submit(m_shader, m_vertex_array);
+
+        // temporary transform function
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), rectangle_transform);
+        glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f));
+        transform = transform * scale;
+
+        for (int i = 0; i < 10; i++) {
+            float offset = i * 1.1f;
+            glm::mat4 square_transform = glm::translate(transform, glm::vec3(offset, 0.0f, 0.0f));
+            m_shader->Bind();
+            m_shader->SetFloat4("u_Color", glm::vec4(rectangle_color, 1.0f));
+            Mint::RenderSystem::Submit(m_shader, m_vertex_array, square_transform);
+        }
+
+        Mint::RenderSystem::Submit(m_texture_shader, m_vertex_array, transform);
+
         Mint::RenderSystem::EndScene();
     }
 
@@ -127,17 +179,24 @@ public:
     }
 
     void OnImGuiRender() override {
+        ImGui::Begin("Settings");
+        ImGui::ColorEdit3("Rectangle Color", glm::value_ptr(rectangle_color));
+        
+        ImGui::End();
     }
 
     private:
-    std::shared_ptr<Mint::Shader> m_shader;
-    std::shared_ptr<Mint::VertexArray> m_vertex_array;
+    Mint::Ref<Mint::Shader> m_shader, m_texture_shader;
+    Mint::Ref<Mint::VertexArray> m_vertex_array;
     // camera
     Mint::Camera m_camera;
     glm::vec3 camera_position;
     float camera_rotation;
     float camera_move_speed = 0.1f;
     float camera_rotation_speed = 2.0f;
+
+    glm::vec3 rectangle_transform;
+    glm::vec3 rectangle_color = glm::vec3(0.2f, 0.3f, 0.8f);
     
 };
 
@@ -150,6 +209,6 @@ public:
     ~Sandbox() override = default;
 };
 
-std::shared_ptr<Mint::Application> Mint::CreateApplication() {
+Mint::Ref<Mint::Application> Mint::CreateApplication() {
     return std::make_shared<Sandbox>();
 }

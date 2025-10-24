@@ -16,7 +16,7 @@ namespace Mint {
             s_renderer_api->SetClearColor(color);
         }
 
-        inline static void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray) {
+        inline static void DrawIndexed(const Ref<VertexArray>& vertexArray) {
             s_renderer_api->DrawIndexed(vertexArray);
         }
 

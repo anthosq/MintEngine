@@ -10,7 +10,7 @@
 // }
 
 extern Mint::RuntimeGlobalContext Mint::g_runtime_global_context;
-extern std::shared_ptr<Mint::Application> Mint::CreateApplication();
+extern Mint::Ref<Mint::Application> Mint::CreateApplication();
 
 int main() {
     Mint::g_runtime_global_context.startSystems();
