@@ -1,9 +1,13 @@
 #pragma once
-#include "renderer_api.h"
+#include "render/renderer_api.h"
 
 namespace Mint {
     class RenderCommand {
     public:
+        inline static void Init() {
+            s_renderer_api->Init();
+        }
+
         inline static void Clear() {
             s_renderer_api->Clear();
         }

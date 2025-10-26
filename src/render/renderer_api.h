@@ -1,6 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
-#include "vertex_array.h"
+#include "render/vertex_array.h"
 
 namespace Mint {
     class RendererAPI {
@@ -11,6 +11,9 @@ namespace Mint {
                 OpenGL = 1,
             };
         public:
+
+            virtual void Init() = 0;
+
             virtual void Clear() = 0;
             virtual void ClearDepth() = 0;
 

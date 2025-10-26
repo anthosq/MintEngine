@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
 
-#include "../../gl_common.h"
-#include "../../shader.h"
+#include "render/interface/opengl/gl_common.h"
+#include "render/shader.h"
 
 
 namespace Mint {

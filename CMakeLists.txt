@@ -18,6 +18,7 @@ include(CMakeDependentOption)
 
 set(MINT_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(SOURCE_DIR "${MINT_ROOT_DIR}/src")
+set(MINT_SANDBOX_DIR "${MINT_ROOT_DIR}/sandbox")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${MINT_ROOT_DIR}/bin")
 
@@ -32,19 +33,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${MINT_ROOT_DIR}/bin")
 
 add_subdirectory("${SOURCE_DIR}")
 
-add_executable(Mint sandbox.cpp)
+add_executable(Mint ${MINT_SANDBOX_DIR}/sandbox.cpp)
 
 
 # 添加源文件到可执行文件
 # target_sources(Mint PUBLIC ${sources})
 
-target_include_directories(Mint 
-    PUBLIC 
-        "${SOURCE_DIR}"
-        "${SOURCE_DIR}/platform/windows"
-        "${SOURCE_DIR}/render"
-        "${SOURCE_DIR}/event"
-)
 target_link_libraries(Mint PUBLIC MintRuntime)
 
 

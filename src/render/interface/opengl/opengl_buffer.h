@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include "render/buffer.h"
-#include "../../gl_common.h"
+#include "render/interface/opengl/gl_common.h"
 
 namespace Mint {
     class OpenGLVertexBuffer : public VertexBuffer {

@@ -43,3 +43,11 @@ if(NOT TARGET assimp)
     add_subdirectory(assimp)
     set_target_properties(assimp PROPERTIES FOLDER ${third_party_dir}/assimp)
 endif()
+
+if(NOT TARGET stb_image)
+    add_library(stb_image STATIC stb_image/stb_image.cpp)
+    target_include_directories(stb_image PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/stb_image
+    )
+    set_target_properties(stb_image PROPERTIES FOLDER ${third_party_dir}/stb_image)
+endif()

@@ -1,5 +1,5 @@
-#include "../../gl_common.h"
-#include "../../graphics_context.h"
+#include "render/interface/opengl/gl_common.h"
+#include "render/graphics_context.h"
 
 namespace Mint {
     class OpenGLContext : public GraphicContext {

@@ -1,9 +1,9 @@
 #pragma once
 
 // TODO: 需要修正路径问题
-#include "../../render/window_system.h"
-#include "../../render/graphics_context.h"
-#include "../../render/gl_common.h"
+#include "render/window_system.h"
+#include "render/graphics_context.h"
+#include "render/interface/opengl/gl_common.h"
 
 #include <string>
 #include <array>

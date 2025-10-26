@@ -1,7 +1,7 @@
 #include "opengl_shader.h"
 #include <string>
 #include <vector>
-#include "../../../log_system.h"
+#include "log_system.h"
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Mint {

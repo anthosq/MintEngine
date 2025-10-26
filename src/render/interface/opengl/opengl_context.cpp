@@ -1,6 +1,5 @@
 #include "opengl_context.h"
-#include "../../gl_common.h"
-#include "../../../log_system.h"
+#include "log_system.h"
 
 
 namespace Mint {

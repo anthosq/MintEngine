@@ -12,11 +12,16 @@ namespace Mint {
 
     Application::Application() {
         s_instance = this;
+        // 之后会重命名Application为MintEngine, 并且把构造函数内的部分内容移到Init函数中
+        // window, renderer之类的子系统转移由RuntimeGlobalContext进行管理, 进行初始化
         m_window = std::unique_ptr<Window>(Window::Create(WindowCreateInfo()));
         // 成员函数指针与std::function不兼容, std::function需要一个可调用对象
         // 所以成员指针需要使用std::bind创一个新的可调用对象
         // 或者使用lambda [this](Event& e) { this->OnEvent(e); }
         m_window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
+
+        RenderSystem::Init();
+
         // 所有权问题, 小心处理
         m_imgui_layer = new ImGuiLayer();
         PushOverlay(m_imgui_layer);

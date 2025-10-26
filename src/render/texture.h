@@ -37,17 +37,18 @@ namespace Mint {
     struct TextureSpecification
     {
         // Later move to Image.h
-        TextureFormat Format = TextureFormat::RGBA8;
+        TextureFormat Format = TextureFormat::None;
 
         uint32_t Width = 1;
         uint32_t Height = 1;
         TextureFilter MinFilter = TextureFilter::Linear;
         TextureFilter MagFilter = TextureFilter::Linear;
-        TextureWrap WrapS = TextureWrap::Repeat;
-        TextureWrap WrapT = TextureWrap::Repeat;
-        
-        // TODO: 后续拓展MipMap相关选项, 以及Storage相关选项
-        // bool GenerateMipMaps = true;
+        TextureWrap WrapS = TextureWrap::ClampToEdge;
+        TextureWrap WrapT = TextureWrap::ClampToEdge;
+
+        // temporary set to false
+        // TODO: 后续完善MipMap相关接口
+        bool GenerateMipMaps = false;
 
     };
 
@@ -56,7 +57,7 @@ namespace Mint {
     public:
         virtual ~Texture() = default;
 
-        virtual void Bind(uint32_t slot) const = 0;
+        virtual void Bind(uint32_t slot = 0) const = 0;
 
         // TextureFormat命名并不准确, 应该是ImageFormat, 暂时如此
         virtual TextureFormat GetFormat() const = 0;

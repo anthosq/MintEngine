@@ -4,7 +4,7 @@
 #include "event/mouse_event.h"
 #include "event/application_event.h"
 #include "log_system.h"
-#include "../../render/interface/opengl/opengl_context.h"
+#include "render/interface/opengl/opengl_context.h"
 
 namespace Mint {
     static uint8_t s_GLFWWindowCount = 0;

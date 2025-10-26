@@ -44,4 +44,5 @@ target_link_libraries(${TARGET_NAME}
         glfw
         glad
         glm
+        stb_image
 )

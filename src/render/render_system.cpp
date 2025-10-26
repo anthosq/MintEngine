@@ -15,6 +15,11 @@ namespace Mint {
     //temporary
     RenderSystem::SceneData* RenderSystem::m_sceneData = new SceneData;
 
+    void RenderSystem::Init() {
+        // Initialize RenderAPI
+        RenderCommand::Init();
+    }
+
     void RenderSystem::BeginScene(Camera& camera) {
         // Prepare something before rendering
         // environment map, cub map sample, camera...

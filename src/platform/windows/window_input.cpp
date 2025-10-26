@@ -1,7 +1,7 @@
 #include "window_input.h"
 
 #include "Application.h"
-#include "../../render/gl_common.h"
+#include "render/interface/opengl/gl_common.h"
 
 namespace Mint {
     

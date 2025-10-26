@@ -108,6 +108,12 @@ public:
 
         m_texture_shader.reset(Mint::Shader::Create(texture_shader_vertex_src, texture_shader_fragment_src));
 
+        // temporary
+        Mint::TextureSpecification spec;
+        spec.MagFilter = Mint::TextureFilter::Nearest;
+        m_texture = Mint::Texture2D::Create(spec, "sandbox/assets/Checkerboard.png");
+
+        m_transparent_texture = Mint::Texture2D::Create(spec, "sandbox/assets/ChernoLogo.png");
     }
 
     void OnUpdate(Mint::TimeStep delta_time) override {
@@ -116,7 +122,7 @@ public:
         // if (Mint::Input::IsKeyPressed(Mint::Key::A)) {
         //     Mint::LOG_INFO("Key A is pressed (polling)");
 
-        Mint::LOG_INFO(fmt::format("Delta Time: {0}", delta_time.GetSeconds()));
+        // Mint::LOG_INFO(fmt::format("Delta Time: {0}", delta_time.GetSeconds()));
         // camera movement
         if (Mint::Input::IsKeyPressed(Mint::Key::W)) {
             camera_position.y += camera_move_speed * delta_time;
@@ -150,17 +156,23 @@ public:
 
         // temporary transform function
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), rectangle_transform);
-        glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f));
+        glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5f, 1.5f, 1.5f));
         transform = transform * scale;
 
-        for (int i = 0; i < 10; i++) {
-            float offset = i * 1.1f;
-            glm::mat4 square_transform = glm::translate(transform, glm::vec3(offset, 0.0f, 0.0f));
-            m_shader->Bind();
-            m_shader->SetFloat4("u_Color", glm::vec4(rectangle_color, 1.0f));
-            Mint::RenderSystem::Submit(m_shader, m_vertex_array, square_transform);
-        }
+        // for (int i = 0; i < 10; i++) {
+        //     float offset = i * 1.1f;
+        //     glm::mat4 square_transform = glm::translate(transform, glm::vec3(offset, 0.0f, 0.0f));
+        //     m_shader->Bind();
+        //     m_shader->SetFloat4("u_Color", glm::vec4(rectangle_color, 1.0f));
+        //     Mint::RenderSystem::Submit(m_shader, m_vertex_array, square_transform);
+        // }
 
+        m_texture->Bind();
+        m_texture_shader->SetInt("u_Texture", 0); // Texture unit 0
+        Mint::RenderSystem::Submit(m_texture_shader, m_vertex_array, transform);
+
+        m_transparent_texture->Bind();
+        m_texture_shader->SetInt("u_Texture", 0); // Texture unit 0
         Mint::RenderSystem::Submit(m_texture_shader, m_vertex_array, transform);
 
         Mint::RenderSystem::EndScene();
@@ -188,6 +200,11 @@ public:
     private:
     Mint::Ref<Mint::Shader> m_shader, m_texture_shader;
     Mint::Ref<Mint::VertexArray> m_vertex_array;
+    Mint::Ref<Mint::Texture2D> m_texture;
+
+    // test
+    Mint::Ref<Mint::Texture2D> m_transparent_texture;
+
     // camera
     Mint::Camera m_camera;
     glm::vec3 camera_position;

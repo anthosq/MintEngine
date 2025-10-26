@@ -4,6 +4,8 @@
 namespace Mint {
     class OpenGLRendererAPI : public RendererAPI {
     public:
+        virtual void Init() override;
+
         virtual void Clear() override;
         virtual void ClearDepth() override;
         virtual void SetClearColor(const glm::vec4& color) override;

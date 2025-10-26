@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <string>
-#include "gl_common.h"
+#include "render/interface/opengl/gl_common.h"
 
 namespace Mint {
     //temporary

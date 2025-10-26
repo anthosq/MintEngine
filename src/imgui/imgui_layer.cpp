@@ -1,8 +1,7 @@
 #include "imgui_layer.h"
 #include "Application.h"
 
-// TODO: 需要修正路径问题
-#include "../render/gl_common.h"
+#include "render/interface/opengl/gl_common.h"
 #include "log_system.h"
 // -----------------    
 

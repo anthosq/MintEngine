@@ -1,5 +1,5 @@
 #pragma once
-#include "render_command.h"
+#include "render/render_command.h"
 #include "render/camera.h"
 #include "render/shader.h"
 #include "Core.h"
@@ -8,6 +8,8 @@ namespace Mint {
 
     class RenderSystem {
     public:
+        static void Init();
+
         static void BeginScene(Camera& camera);
 
         static void EndScene();
