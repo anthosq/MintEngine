@@ -8,7 +8,9 @@ namespace Mint {
     // temporary implementation
     OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification& spec)
         : m_specification(spec), m_isLoaded(false) {
-        
+            // generate empty texture
+            
+    
     }
 
     OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification& spec, const std::filesystem::path& path)

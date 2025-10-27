@@ -1,27 +1,7 @@
-# MintEngine
-Toy Game Engine for learning 
-
-
-# Ongoing task:
-## Render System
-- Planning to support OpenGL first and then expand to Vulkan
-- RHI RenderScene RenderResource RenderPipeline?
-- Consider
-```
-Application Layer
-      ↓
-RenderSystem (High-level Interface)
-      ↓
-RenderScene (Scene Management)
-      ↓
-RenderPipeline (Rendering Logic)
-      ↓
-RHI (Render Hardware Interface)
-      ↓
-Graphics API (Vulkan)
-```
-
-### General RHI Design
-- 
-### OpenGL RHI Design
--
+# TODO List
+- complete the full texture implementation
+- implement the ref and ref count system
+- implement the mesh and reconstruct the rendersystem
+- rearrange the file structure:
+  - move event, math to core
+  - create function folder, contains the render and other function part

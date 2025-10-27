@@ -38,82 +38,14 @@ public:
         unsigned int indices[6] = {0, 1, 2, 0, 3, 2};
         m_index_buffer.reset(Mint::IndexBuffer::Create(indices, 6));
 
-        m_vertex_array->SetIndexBuffer(m_index_buffer);
-        // drawing rectangle
-        std::string vertex_src = R"(
-            #version 330 core
+        // shader wrap seems completed
+        m_shader.reset(Mint::Shader::Create("sandbox/assets/shaders/test_shader.glsl"));
 
-            layout(location = 0) in vec3 a_position;
+        m_texture_shader.reset(Mint::Shader::Create("sandbox/assets/shaders/test_texture.glsl"));
 
-            uniform mat4 u_ViewProjection;
-            uniform mat4 u_Transform;
-
-            out vec3 v_position;
-
-            void main()
-            {
-                v_position = a_position;
-                gl_Position = u_ViewProjection * u_Transform * vec4(a_position, 1.0);
-            }
-        )";
-        std::string fragment_src = R"(
-            #version 330 core
-
-            layout(location = 0) out vec4 color;
-
-            in vec3 v_position;
-
-            uniform vec4 u_Color;
-
-            void main()
-            {
-                color = u_Color;
-                // color = vec4(v_position * 0.5 + 0.5, 1.0);
-            }
-        )";
-        m_shader.reset(Mint::Shader::Create(vertex_src, fragment_src));
-        // ---------------------------------
-        // texture shader
-        std::string texture_shader_vertex_src = R"(
-            #version 330 core
-
-            layout(location = 0) in vec3 a_position;
-            layout(location = 1) in vec2 a_texCoord;
-
-            uniform mat4 u_ViewProjection;
-            uniform mat4 u_Transform;
-
-            out vec2 v_texCoord;
-
-            void main()
-            {
-                v_texCoord = a_texCoord;
-                gl_Position = u_ViewProjection * u_Transform * vec4(a_position, 1.0);
-            }
-        )";
-        std::string texture_shader_fragment_src = R"(
-            #version 330 core
-
-            layout(location = 0) out vec4 color;
-
-            in vec2 v_texCoord;
-
-            uniform sampler2D u_Texture;
-
-            void main()
-            {
-                color = texture(u_Texture, v_texCoord);
-            }
-        )";
-
-        m_texture_shader.reset(Mint::Shader::Create(texture_shader_vertex_src, texture_shader_fragment_src));
-
-        // temporary
         Mint::TextureSpecification spec;
-        spec.MagFilter = Mint::TextureFilter::Nearest;
-        m_texture = Mint::Texture2D::Create(spec, "sandbox/assets/Checkerboard.png");
-
-        m_transparent_texture = Mint::Texture2D::Create(spec, "sandbox/assets/ChernoLogo.png");
+        m_texture = Mint::Texture2D::Create({.MagFilter = Mint::TextureFilter::Nearest}, "sandbox/assets/pics/Checkerboard.png");
+        m_transparent_texture = Mint::Texture2D::Create({.MagFilter = Mint::TextureFilter::Nearest}, "sandbox/assets/pics/ChernoLogo.png");
     }
 
     void OnUpdate(Mint::TimeStep delta_time) override {
@@ -127,7 +59,7 @@ public:
         if (Mint::Input::IsKeyPressed(Mint::Key::W)) {
             camera_position.y += camera_move_speed * delta_time;
         }
-        else if (Mint::Input::IsKeyPressed(Mint::Key::S)) {
+        else if(Mint::Input::IsKeyPressed(Mint::Key::S)) {
             camera_position.y -= camera_move_speed * delta_time;
         }
         if (Mint::Input::IsKeyPressed(Mint::Key::A)) {

@@ -4,6 +4,9 @@
 #include <cstdint>
 #include <memory>
 #include <glm/glm.hpp>
+#include <filesystem>
+
+#include "Core.h"
 
 namespace Mint {
     class Shader {
@@ -24,9 +27,20 @@ namespace Mint {
 
         virtual void SetMat3(const std::string& name, const glm::mat3& matrix) = 0;
         virtual void SetMat4(const std::string& name, const glm::mat4& matrix) = 0;
-        
 
+        // future use asset resource & metadata to load shader from file
+        // like ShaderLibrary->Load(name, path);
+        // using Ref to manage ShaderLibrary & Shader
+        static Shader* Create(const std::filesystem::path& filepath);
 
         static Shader* Create(const std::string& vertex_src, const std::string& fragment_src);
     };
+    
+    class ShaderLibrary {
+        public:
+            virtual ~ShaderLibrary() = default;
+            virtual void Add(const std::string& name, const std::shared_ptr<Shader>& shader) = 0;
+            virtual Ref<Shader> Load(const std::string& name, const std::filesystem::path& filepath) = 0;
+            virtual Ref<Shader> Load(const std::filesystem::path& filepath) = 0;
+    };  
 }
