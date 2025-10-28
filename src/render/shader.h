@@ -31,7 +31,7 @@ namespace Mint {
         // future use asset resource & metadata to load shader from file
         // like ShaderLibrary->Load(name, path);
         // using Ref to manage ShaderLibrary & Shader
-        static Shader* Create(const std::filesystem::path& filepath);
+        static Ref<Shader> Create(const std::filesystem::path& filepath);
         virtual const std::string& GetName() const = 0;
     };
     

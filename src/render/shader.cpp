@@ -4,12 +4,11 @@
 #include "log_system.h"
 
 namespace Mint {
-    Shader* Shader::Create(const std::filesystem::path &filepath) {
+    Ref<Shader> Shader::Create(const std::filesystem::path &filepath) {
         // Here we can add support for different rendering APIs in the future
         switch (RendererAPI::GetAPI()) {
             case RendererAPI::API::None:            return nullptr;
-            case RendererAPI::API::OpenGL:          return new OpenGLShader(filepath);
-            // case RendererAPI::API::OpenGL:          return new OpenGLShader(filepath.tostring());
+            case RendererAPI::API::OpenGL:          return std::make_shared<OpenGLShader>(filepath);
         }
 
         return nullptr;

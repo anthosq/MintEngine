@@ -66,6 +66,65 @@ namespace Mint {
             pos = m_shader_resource.find(type_token, next_line_pos);
             shader_sources[ShaderTypeFromString(type)] = m_shader_resource.substr(next_line_pos, pos - (next_line_pos == std::string::npos ? m_shader_resource.size() - 1 : next_line_pos));
         }
+        // while (pos != std::string::npos) {
+        //     // 找到行尾
+        //     size_t eol = m_shader_resource.find_first_of("\r\n", pos);
+        //     if (eol == std::string::npos)
+        //     {
+        //         LOG_ERROR("Shader format error: no line ending after #type");
+        //         return;
+        //     }
+
+        //     // 提取shader类型名称
+        //     size_t begin = pos + type_token_length + 1;
+        //     std::string type = m_shader_resource.substr(begin, eol - begin);
+
+        //     // 去除前后空格
+        //     size_t first_non_space = type.find_first_not_of(" \t");
+        //     size_t last_non_space = type.find_last_not_of(" \t");
+        //     if (first_non_space != std::string::npos)
+        //     {
+        //         type = type.substr(first_non_space, last_non_space - first_non_space + 1);
+        //     }
+
+        //     LOG_INFO(fmt::format("Found shader type: '{0}'", type));
+
+        //     // 找到下一行的开始
+        //     size_t next_line_pos = m_shader_resource.find_first_not_of("\r\n", eol);
+        //     if (next_line_pos == std::string::npos) {
+        //         LOG_ERROR(fmt::format("No shader code found for type '{0}'", type));
+        //         return;
+        //     }
+
+        //     // 找到下一个#type或文件结尾
+        //     pos = m_shader_resource.find(type_token, next_line_pos);
+
+        //     // 提取shader源码
+        //     std::string source;
+        //     if (pos == std::string::npos) {
+        //         // 这是最后一个shader,取到文件末尾
+        //         source = m_shader_resource.substr(next_line_pos);
+        //     }
+        //     else {
+        //         // 取到下一个#type之前
+        //         source = m_shader_resource.substr(next_line_pos, pos - next_line_pos);
+        //     }
+
+        //     GLenum shader_type = ShaderTypeFromString(type);
+        //     if (shader_type == 0) {
+        //         LOG_ERROR(fmt::format("Invalid shader type: '{0}'", type));
+        //         continue;
+        //     }
+
+        //     shader_sources[shader_type] = source;
+        //     LOG_INFO(fmt::format("Extracted {0} shader, length: {1} bytes", type, source.length()));
+        // }
+
+        // if (shader_sources.empty())
+        // {
+        //     LOG_ERROR("No valid shader sources found!");
+        //     return;
+        // }
 
         std::vector<GLuint> shader_renderer_ids;
 
