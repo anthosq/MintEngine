@@ -1,24 +1,45 @@
 #include "shader.h"
 #include "render/interface/opengl/opengl_shader.h"
 #include "render/renderer_api.h"
+#include "log_system.h"
 
 namespace Mint {
     Shader* Shader::Create(const std::filesystem::path &filepath) {
         // Here we can add support for different rendering APIs in the future
         switch (RendererAPI::GetAPI()) {
             case RendererAPI::API::None:            return nullptr;
-            case RendererAPI::API::OpenGL:          return new OpenGLShader(filepath.string());
+            case RendererAPI::API::OpenGL:          return new OpenGLShader(filepath);
+            // case RendererAPI::API::OpenGL:          return new OpenGLShader(filepath.tostring());
         }
 
         return nullptr;
     }
 
-    Shader* Shader::Create(const std::string &vertex_src, const std::string &fragment_src) {
-        switch (RendererAPI::GetAPI()) {
-            case RendererAPI::API::None:            return nullptr;
-            case RendererAPI::API::OpenGL:          return new OpenGLShader(vertex_src, fragment_src);
-        }
-
-        return nullptr;
+    // TODO: modify after completing ASSERT macro
+    void ShaderLibrary::Add(const Ref<Shader> &shader) {
+        std::string name = shader->GetName();
+        assert(m_shaders.find(name) == m_shaders.end());
+        m_shaders[name] = shader;
     }
+
+    // TODO: use string_view
+    Ref<Shader> ShaderLibrary::Load(const std::string &name, const std::filesystem::path &filepath) {
+        assert(m_shaders.find(name) == m_shaders.end());
+        m_shaders[name] = std::shared_ptr<Shader>(Shader::Create(filepath));
+        return m_shaders[name];
+    }
+
+    Ref<Shader> ShaderLibrary::Load(const std::filesystem::path &filepath) {
+        std::string name = filepath.stem().string();
+        LOG_INFO(fmt::format("Loading shader: {0}", name));
+        return Load(name, filepath);
+    }
+
+    const Ref<Shader> ShaderLibrary::Get(const std::string &name) const {
+        assert(m_shaders.find(name) != m_shaders.end());
+        LOG_INFO(fmt::format("Getting shader: {0}", name));
+        return m_shaders.at(name);
+    }
+
+
 }

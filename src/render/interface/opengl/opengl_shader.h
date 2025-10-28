@@ -9,7 +9,6 @@ namespace Mint {
     class OpenGLShader : public Shader {
     public:
         OpenGLShader(const std::filesystem::path& filepath);
-        OpenGLShader(const std::string& vertex_src, const std::string& fragment_src);
         ~OpenGLShader();
 
         void Bind() const;
@@ -26,6 +25,7 @@ namespace Mint {
         
         void SetMat3(const std::string& name, const glm::mat3& matrix) override;
         void SetMat4(const std::string& name, const glm::mat4& matrix) override;
+        const std::string& GetName() const override { return m_name; }
 
     private:
         void UploadUniformInt(const std::string& name, int value);
@@ -42,6 +42,7 @@ namespace Mint {
         static GLenum ShaderTypeFromString(const std::string& type);
         void CompileAndUploadShader();
 
+
     private:
         std::string m_name;
         std::filesystem::path m_asset_path;
@@ -49,12 +50,4 @@ namespace Mint {
         uint32_t m_renderer_id;
     };
 
-    // adding ShaderLibrary?
-    class OpenGLShaderLibrary : public ShaderLibrary {
-    public:
-        virtual ~OpenGLShaderLibrary() = default;
-        virtual void Add(const std::string& name, const std::shared_ptr<Shader>& shader) override;
-        virtual Ref<Shader> Load(const std::string& name, const std::filesystem::path& filepath) override;
-        virtual Ref<Shader> Load(const std::filesystem::path& filepath) override;
-    };
 }

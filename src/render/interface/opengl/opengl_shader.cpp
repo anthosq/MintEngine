@@ -11,113 +11,16 @@ namespace Mint {
         : m_asset_path(filepath.string()) {
         m_name = filepath.filename().string();
         ReadShaderFromFile(filepath);
+        
+        LOG_INFO(fmt::format("Shader file loaded, size: {0} bytes", m_shader_resource.size()));
+
         CompileAndUploadShader();
-    }
 
-    OpenGLShader::OpenGLShader(const std::string& vertex_src, const std::string& fragment_src) {
-        // Create an empty vertex shader handle
-        GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-        // Send the vertex shader source code to GL
-        // Note that std::string's .c_str is NULL character terminated.
-        const GLchar* source = vertex_src.c_str();
-        glShaderSource(vertexShader, 1, &source, 0);
-
-        // Compile the vertex shader
-        glCompileShader(vertexShader);
-
-        GLint isCompiled = 0;
-        glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &isCompiled);
-        if (isCompiled == GL_FALSE) {
-            GLint maxLength = 0;
-            glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &maxLength);
-
-            // The maxLength includes the NULL character
-            std::vector<GLchar> infoLog(maxLength);
-            glGetShaderInfoLog(vertexShader, maxLength, &maxLength, &infoLog[0]);
-
-            // We don't need the shader anymore.
-            glDeleteShader(vertexShader);
-
-            // Use the infoLog as you see fit.
-            LOG_ERROR("Vertex shader compilation failure!");
-            LOG_ERROR(fmt::format("{0}", infoLog.data()));
+        if (m_renderer_id == 0) {
+            LOG_ERROR(fmt::format("Shader {0} failed to compile/link!", filepath.string()));
+        } else {
+            LOG_INFO(fmt::format("Shader {0} compiled successfully, ID: {1}", m_name, m_renderer_id));
         }
-
-        // Create an empty fragment shader handle
-        GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-        // Send the fragment shader source code to GL
-        // Note that std::string's .c_str is NULL character terminated.
-        source = fragment_src.c_str();
-        glShaderSource(fragmentShader, 1, &source, 0);
-
-        // Compile the fragment shader
-        glCompileShader(fragmentShader);
-
-        glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &isCompiled);
-        if (isCompiled == GL_FALSE) {
-            GLint maxLength = 0;
-            glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &maxLength);
-
-            // The maxLength includes the NULL character
-            std::vector<GLchar> infoLog(maxLength);
-            glGetShaderInfoLog(fragmentShader, maxLength, &maxLength, &infoLog[0]);
-
-            // We don't need the shader anymore.
-            glDeleteShader(fragmentShader);
-            // Either of them. Don't leak shaders.
-            glDeleteShader(vertexShader);
-
-            // Use the infoLog as you see fit.
-
-            // In this simple program, we'll just leave
-            LOG_ERROR("Fragment shader compilation failure!");
-            LOG_ERROR(fmt::format("{0}", infoLog.data()));
-            return;
-        }
-
-        // Vertex and fragment shaders are successfully compiled.
-        // Now time to link them together into a program.
-        // Get a program object.
-        GLuint program = glCreateProgram();
-        m_renderer_id = program;
-
-        // Attach our shaders to our program
-        glAttachShader(program, vertexShader);
-        glAttachShader(program, fragmentShader);
-
-        // Link our program
-        glLinkProgram(program);
-
-        // Note the different functions here: glGetProgram* instead of glGetShader*.
-        GLint isLinked = 0;
-        glGetProgramiv(program, GL_LINK_STATUS, (int *)&isLinked);
-        if (isLinked == GL_FALSE)
-        {
-            GLint maxLength = 0;
-            glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
-
-            // The maxLength includes the NULL character
-            std::vector<GLchar> infoLog(maxLength);
-            glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
-
-            // We don't need the program anymore.
-            glDeleteProgram(program);
-            // Don't leak shaders either.
-            glDeleteShader(vertexShader);
-            glDeleteShader(fragmentShader);
-
-            // Use the infoLog as you see fit.
-
-            LOG_ERROR("Shader link failure!");
-            LOG_ERROR(fmt::format("{0}", infoLog.data()));
-            return;
-        }
-
-        // Always detach shaders after a successful link.
-        glDetachShader(program, vertexShader);
-        glDetachShader(program, fragmentShader);
     }
 
     void OpenGLShader::ReadShaderFromFile(const std::filesystem::path& filepath) {
@@ -212,8 +115,8 @@ namespace Mint {
 
             glDeleteProgram(program);
 
-            for (auto shader : shader_renderer_ids) {
-                glDeleteShader(shader);
+            for (auto id : shader_renderer_ids) {
+                glDeleteShader(id);
             }
 
             LOG_ERROR("Shader link failure!");
@@ -223,8 +126,8 @@ namespace Mint {
         }
 
         // Always detach shaders after a successful link.
-        for (auto shader : shader_renderer_ids) {
-            glDetachShader(program, shader);
+        for (auto id : shader_renderer_ids) {
+            glDetachShader(program, id);
         }
 
         m_renderer_id = program;
