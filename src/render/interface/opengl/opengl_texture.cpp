@@ -45,8 +45,8 @@ namespace Mint {
             m_specification.Format = (dataFormat == GL_RGB) ? TextureFormat::RGB8 : TextureFormat::RGBA8;
         }
 
-        LOG_INFO(fmt::format("Loaded texture {0} ({1}x{2}, {3} channels)", path.string(), width, height, channels));
-        LOG_INFO(fmt::format("Inferred format: internalFormat={0}, dataFormat={1}", internalFormat, dataFormat));
+        // LOG_INFO(fmt::format("Loaded texture {0} ({1}x{2}, {3} channels)", path.string(), width, height, channels));
+        // LOG_INFO(fmt::format("Inferred format: internalFormat={0}, dataFormat={1}", internalFormat, dataFormat));
 
         glCreateTextures(GL_TEXTURE_2D, 1, &m_rendererID);
         glTextureStorage2D(m_rendererID, 1, internalFormat, m_specification.Width, m_specification.Height);

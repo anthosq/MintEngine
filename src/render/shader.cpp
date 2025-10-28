@@ -30,13 +30,11 @@ namespace Mint {
 
     Ref<Shader> ShaderLibrary::Load(const std::filesystem::path &filepath) {
         std::string name = filepath.stem().string();
-        LOG_INFO(fmt::format("Loading shader: {0}", name));
         return Load(name, filepath);
     }
 
     const Ref<Shader> ShaderLibrary::Get(const std::string &name) const {
         assert(m_shaders.find(name) != m_shaders.end());
-        LOG_INFO(fmt::format("Getting shader: {0}", name));
         return m_shaders.at(name);
     }
 

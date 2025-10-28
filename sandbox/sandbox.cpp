@@ -42,7 +42,7 @@ public:
         // shader wrap seems completed
         m_shader = Mint::Shader::Create("sandbox/assets/shaders/test_shader.glsl");
 
-        m_texture_shader = Mint::Shader::Create("sandbox/assets/shaders/test_texture.glsl");
+        m_shader_library.Load("sandbox/assets/shaders/test_texture.glsl");
 
         Mint::TextureSpecification spec;
         m_texture = Mint::Texture2D::Create({.MagFilter = Mint::TextureFilter::Nearest}, "sandbox/assets/pics/Checkerboard.png");
@@ -101,6 +101,7 @@ public:
         // }
 
         m_texture->Bind();
+        auto m_texture_shader = m_shader_library.Get("test_texture");
         m_texture_shader->SetInt("u_Texture", 0); // Texture unit 0
         Mint::RenderSystem::Submit(m_texture_shader, m_vertex_array, transform);
 
@@ -131,9 +132,10 @@ public:
     }
 
     private:
-    Mint::Ref<Mint::Shader> m_shader, m_texture_shader;
+    Mint::Ref<Mint::Shader> m_shader;
     Mint::Ref<Mint::VertexArray> m_vertex_array;
     Mint::Ref<Mint::Texture2D> m_texture;
+    Mint::ShaderLibrary m_shader_library;
 
     // test
     Mint::Ref<Mint::Texture2D> m_transparent_texture;
