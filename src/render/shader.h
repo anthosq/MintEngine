@@ -31,16 +31,23 @@ namespace Mint {
         // future use asset resource & metadata to load shader from file
         // like ShaderLibrary->Load(name, path);
         // using Ref to manage ShaderLibrary & Shader
-        static Shader* Create(const std::filesystem::path& filepath);
-
-        static Shader* Create(const std::string& vertex_src, const std::string& fragment_src);
+        static Ref<Shader> Create(const std::filesystem::path& filepath);
+        virtual const std::string& GetName() const = 0;
     };
     
+    // finnaly handled by ASSET system
     class ShaderLibrary {
         public:
-            virtual ~ShaderLibrary() = default;
-            virtual void Add(const std::string& name, const std::shared_ptr<Shader>& shader) = 0;
-            virtual Ref<Shader> Load(const std::string& name, const std::filesystem::path& filepath) = 0;
-            virtual Ref<Shader> Load(const std::filesystem::path& filepath) = 0;
-    };  
+            ~ShaderLibrary() = default;
+            void Add(const Ref<Shader> &shader);
+            Ref<Shader> Load(const std::string &name, const std::filesystem::path &filepath);
+            Ref<Shader> Load(const std::filesystem::path &filepath);
+
+            const Ref<Shader> Get(const std::string &name) const;
+            std::unordered_map<std::string, Ref<Shader>>& GetShaders() { return m_shaders; }
+            const std::unordered_map<std::string, Ref<Shader>>& GetShaders() const { return m_shaders; }
+
+        private:
+            std::unordered_map<std::string, Ref<Shader>> m_shaders;
+    };
 }

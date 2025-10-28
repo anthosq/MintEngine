@@ -37,11 +37,12 @@ public:
         // index buffer
         unsigned int indices[6] = {0, 1, 2, 0, 3, 2};
         m_index_buffer.reset(Mint::IndexBuffer::Create(indices, 6));
+        m_vertex_array->SetIndexBuffer(m_index_buffer);
 
         // shader wrap seems completed
-        m_shader.reset(Mint::Shader::Create("sandbox/assets/shaders/test_shader.glsl"));
+        m_shader = Mint::Shader::Create("sandbox/assets/shaders/test_shader.glsl");
 
-        m_texture_shader.reset(Mint::Shader::Create("sandbox/assets/shaders/test_texture.glsl"));
+        m_texture_shader = Mint::Shader::Create("sandbox/assets/shaders/test_texture.glsl");
 
         Mint::TextureSpecification spec;
         m_texture = Mint::Texture2D::Create({.MagFilter = Mint::TextureFilter::Nearest}, "sandbox/assets/pics/Checkerboard.png");
