@@ -17,8 +17,9 @@ namespace Mint {
             m_application.reset();
             LOG_INFO("Application shut down.");
         }
-        m_log_system.reset();
         LOG_INFO("Log system shut down.");
+        RefUtils::DumpLiveRefs();
+        m_log_system.reset();
     }
 
 }

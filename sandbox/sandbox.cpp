@@ -12,7 +12,7 @@ public:
         // Vertex Array
         // Index Buffer
 
-        m_vertex_array.Reset(Mint::VertexArray::Create());
+        m_vertex_array = Mint::VertexArray::Create();
 
         // adding texture coordinates
         float vertices[4 * 5] = {

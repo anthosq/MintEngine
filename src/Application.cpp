@@ -76,7 +76,6 @@ namespace Mint {
             m_window->OnUpdate();
         }
         g_runtime_global_context.shutdownSystems();
-        
     }
 
 

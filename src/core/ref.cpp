@@ -31,10 +31,9 @@ namespace Mint {
         void DumpLiveRefs() {
             std::shared_lock lock(g_live_ref_mutex);
             LOG_INFO(fmt::format("Dumping live refs, count: {}", g_live_refs.size()));
-            for (auto& ref : g_live_refs) {
-                LOG_INFO(fmt::format(" - {}", ref));
+            for (auto &ref : g_live_refs) {
+                LOG_INFO(fmt::format(" - ptr: {}, type: {}", ref, typeid(*static_cast<RefCounter *>(ref)).name()));
             }
         }
     }
-
 }
