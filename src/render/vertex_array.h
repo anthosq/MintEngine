@@ -1,9 +1,9 @@
 #pragma once
 #include "render/buffer.h"
-#include "Core.h"
+#include "core/ref.h"
 
 namespace Mint {
-    class VertexArray {
+    class VertexArray : public RefCounter {
         public:
             virtual ~VertexArray() = default;
 

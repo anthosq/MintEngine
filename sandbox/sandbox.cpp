@@ -12,7 +12,7 @@ public:
         // Vertex Array
         // Index Buffer
 
-        m_vertex_array.reset(Mint::VertexArray::Create());
+        m_vertex_array.Reset(Mint::VertexArray::Create());
 
         // adding texture coordinates
         float vertices[4 * 5] = {
@@ -24,7 +24,7 @@ public:
         // vertex buffer
         Mint::Ref<Mint::VertexBuffer> m_vertex_buffer;
         Mint::Ref<Mint::IndexBuffer> m_index_buffer;
-        m_vertex_buffer.reset(Mint::VertexBuffer::Create(vertices, sizeof(vertices)));
+        m_vertex_buffer = Mint::VertexBuffer::Create(vertices, sizeof(vertices));
 
         Mint::BufferLayout layout = {
             {Mint::ShaderDataType::Float3, "a_position"},
@@ -36,7 +36,7 @@ public:
 
         // index buffer
         unsigned int indices[6] = {0, 1, 2, 0, 3, 2};
-        m_index_buffer.reset(Mint::IndexBuffer::Create(indices, 6));
+        m_index_buffer = Mint::IndexBuffer::Create(indices, 6);
         m_vertex_array->SetIndexBuffer(m_index_buffer);
 
         // shader wrap seems completed
@@ -161,6 +161,6 @@ public:
     ~Sandbox() override = default;
 };
 
-Mint::Ref<Mint::Application> Mint::CreateApplication() {
+std::shared_ptr<Mint::Application> Mint::CreateApplication() {
     return std::make_shared<Sandbox>();
 }

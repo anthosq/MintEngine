@@ -6,10 +6,10 @@
 #include <glm/glm.hpp>
 #include <filesystem>
 
-#include "Core.h"
+#include "core/ref.h"
 
 namespace Mint {
-    class Shader {
+    class Shader : public RefCounter {
     public:
         // temporary factory method
         virtual ~Shader() = default;
@@ -36,12 +36,12 @@ namespace Mint {
     };
     
     // finnaly handled by ASSET system
-    class ShaderLibrary {
+    class ShaderLibrary : public RefCounter {
         public:
             ~ShaderLibrary() = default;
             void Add(const Ref<Shader> &shader);
-            Ref<Shader> Load(const std::string &name, const std::filesystem::path &filepath);
-            Ref<Shader> Load(const std::filesystem::path &filepath);
+            void Load(const std::string &name, const std::filesystem::path &filepath);
+            void Load(const std::filesystem::path &filepath);
 
             const Ref<Shader> Get(const std::string &name) const;
             std::unordered_map<std::string, Ref<Shader>>& GetShaders() { return m_shaders; }

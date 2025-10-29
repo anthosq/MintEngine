@@ -48,6 +48,6 @@ namespace Mint {
     };
 
     // to be defined in client
-    Ref<Application> CreateApplication();
+    std::shared_ptr<Application> CreateApplication();
 
 }

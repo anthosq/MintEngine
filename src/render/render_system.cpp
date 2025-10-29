@@ -33,7 +33,9 @@ namespace Mint {
         // End of rendering
     }
 
-    void RenderSystem::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transform) {
+    // remove const from shader
+    // not sure 
+    void RenderSystem::Submit(Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transform) {
         // not sure
         shader->Bind();
         shader->SetMat4("u_ViewProjection", m_sceneData->viewProjectionMatrix);

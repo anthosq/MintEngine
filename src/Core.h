@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include "core/ref.h"
 
 //temporary macros
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
@@ -16,8 +17,4 @@ namespace Mint {
     using Scope = std::unique_ptr<T>;
 
     // Asset使用shared_ptr管理
-    template<typename T>
-    using Ref = std::shared_ptr<T>;
-
-
 }

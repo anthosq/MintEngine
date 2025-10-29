@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <filesystem>
 
-#include "Core.h"
+#include "core/ref.h"
 #include <glm/glm.hpp>
 
 // TODO: 完成Asset系统后, 重构Texture相关类
@@ -53,7 +53,8 @@ namespace Mint {
     };
 
     // TODO: 后续接入Asset系统, 继承自RenderableAsset(利用Ref类, 完善Asset系统)
-    class Texture {
+    // 目前使用RefCounted基类
+    class Texture : public RefCounter {
     public:
         virtual ~Texture() = default;
 

@@ -4,6 +4,8 @@
 #include <string>
 #include "render/interface/opengl/gl_common.h"
 
+#include "core/ref.h"
+
 namespace Mint {
     //temporary
 
@@ -79,7 +81,7 @@ namespace Mint {
     };
 
 
-    class BufferLayout {
+    class BufferLayout{
         public:
             BufferLayout() = default;
             BufferLayout(const std::initializer_list<BufferElement>& element) 
@@ -110,7 +112,7 @@ namespace Mint {
     };
 
     // abstract class
-    class VertexBuffer {
+    class VertexBuffer : public RefCounter {
         public:
             virtual ~VertexBuffer() = default;
 
@@ -122,12 +124,12 @@ namespace Mint {
 
             virtual void SetData(const void* data, uint32_t size) = 0;
 
-            static VertexBuffer* Create(uint32_t size);
-            static VertexBuffer* Create(float* vertices, uint32_t size);
+            static Ref<VertexBuffer> Create(uint32_t size);
+            static Ref<VertexBuffer> Create(float* vertices, uint32_t size);
     };
 
 
-    class IndexBuffer {
+    class IndexBuffer : public RefCounter {
         public:
             virtual ~IndexBuffer() = default;
 
@@ -135,7 +137,7 @@ namespace Mint {
             virtual void Unbind() const = 0;
             virtual uint32_t GetCount() const = 0;
 
-            static IndexBuffer* Create(uint32_t* indices, uint32_t count);
+            static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t count);
     };
     
 }

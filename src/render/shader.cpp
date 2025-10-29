@@ -3,12 +3,13 @@
 #include "render/renderer_api.h"
 #include "log_system.h"
 
+
 namespace Mint {
     Ref<Shader> Shader::Create(const std::filesystem::path &filepath) {
         // Here we can add support for different rendering APIs in the future
         switch (RendererAPI::GetAPI()) {
             case RendererAPI::API::None:            return nullptr;
-            case RendererAPI::API::OpenGL:          return std::make_shared<OpenGLShader>(filepath);
+            case RendererAPI::API::OpenGL:          return Ref<OpenGLShader>::Create(filepath);
         }
 
         return nullptr;
@@ -22,15 +23,14 @@ namespace Mint {
     }
 
     // TODO: use string_view
-    Ref<Shader> ShaderLibrary::Load(const std::string &name, const std::filesystem::path &filepath) {
+    void ShaderLibrary::Load(const std::string &name, const std::filesystem::path &filepath) {
         assert(m_shaders.find(name) == m_shaders.end());
-        m_shaders[name] = std::shared_ptr<Shader>(Shader::Create(filepath));
-        return m_shaders[name];
+        m_shaders[name] = Shader::Create(filepath);
     }
 
-    Ref<Shader> ShaderLibrary::Load(const std::filesystem::path &filepath) {
+    void ShaderLibrary::Load(const std::filesystem::path &filepath) {
         std::string name = filepath.stem().string();
-        return Load(name, filepath);
+        Load(name, filepath);
     }
 
     const Ref<Shader> ShaderLibrary::Get(const std::string &name) const {
