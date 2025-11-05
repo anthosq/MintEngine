@@ -29,7 +29,9 @@ namespace Mint {
  
     void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray) {
         // 让下一个绘制覆盖VAO
+        // 需要重构以支持skybox
         vertexArray->Bind();
+        auto indexbuffer = vertexArray->GetIndexBuffer();
         glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
     }
 }

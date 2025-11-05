@@ -22,7 +22,7 @@ namespace Mint {
         void SetFloat2(const std::string& name, const glm::vec2& vector) override;
         void SetFloat3(const std::string& name, const glm::vec3& vector) override;
         void SetFloat4(const std::string& name, const glm::vec4& vector) override;
-        
+
         void SetMat3(const std::string& name, const glm::mat3& matrix) override;
         void SetMat4(const std::string& name, const glm::mat4& matrix) override;
         const std::string& GetName() const override { return m_name; }

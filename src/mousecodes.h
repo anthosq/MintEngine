@@ -2,8 +2,7 @@
 #include <cstdint>
 
 namespace Mint {
-    using MouseCode = uint16_t;
-    enum : MouseCode {
+    enum class MouseCode : uint16_t {
         Button0 = 0,
         Button1 = 1,
         Button2 = 2,

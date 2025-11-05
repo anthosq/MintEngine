@@ -32,6 +32,7 @@ namespace Mint {
         void Unbind() const;
 
         uint32_t GetCount() const { return m_count; }
+        void SetData(const void* data, uint32_t size) override;
 
     private:
         uint32_t m_renderer_id;

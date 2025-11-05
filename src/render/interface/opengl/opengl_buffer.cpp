@@ -55,4 +55,8 @@ namespace Mint {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
+    void OpenGLIndexBuffer::SetData(const void* data, uint32_t size) {
+        glNamedBufferSubData(m_renderer_id, 0, size, data);
+    }
+
 }

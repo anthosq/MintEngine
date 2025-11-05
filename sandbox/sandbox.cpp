@@ -3,8 +3,8 @@
 
 class ExampleLayer : public Mint::Layer {
 public:
-    ExampleLayer() : Layer("Example"), m_camera(-1.6f, 1.6f, -0.9f, 0.9f), // 16:9 纵横比
-                     camera_position(0.0f, 0.0f, 0.0f), camera_rotation(0.0f), rectangle_transform({0.0f, 0.0f, 0.0f}) { 
+    ExampleLayer() : Layer("Example"), m_camera(60, 1600.0f / 900.0f, 0.1f, 100.0f), // 16:9 纵横比
+                     rectangle_transform({0.0f, 0.0f, 0.0f}) { 
         // Mint::LOG_INFO("ExampleLayer::OnAttach");
 
         // -------------临时------------------
@@ -19,7 +19,8 @@ public:
             -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
             -0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
              0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-             0.5f, -0.5f, 0.0f, 1.0f, 0.0f};
+             0.5f, -0.5f, 0.0f, 1.0f, 0.0f
+            };
 
         // vertex buffer
         Mint::Ref<Mint::VertexBuffer> m_vertex_buffer;
@@ -47,6 +48,67 @@ public:
         Mint::TextureSpecification spec;
         m_texture = Mint::Texture2D::Create({.MagFilter = Mint::TextureFilter::Nearest}, "sandbox/assets/pics/Checkerboard.png");
         m_transparent_texture = Mint::Texture2D::Create({.MagFilter = Mint::TextureFilter::Nearest}, "sandbox/assets/pics/ChernoLogo.png");
+
+        // // test for skybox
+        // // 在 ExampleLayer 构造函数中添加
+        // Mint::TextureSpecification cubeSpec;
+        // cubeSpec.MinFilter = Mint::TextureFilter::Linear;
+        // cubeSpec.MagFilter = Mint::TextureFilter::Linear;
+        // cubeSpec.WrapS = Mint::TextureWrap::ClampToEdge;
+        // cubeSpec.WrapT = Mint::TextureWrap::ClampToEdge;
+
+        // m_skybox_texture = Mint::TextureCube::Create(cubeSpec, "sandbox/assets/pics/Arches_E_PineTree_Radiance.tga");
+        // m_shader_library.Load("sandbox/assets/shaders/test_skybox.glsl");
+        // float skyboxVertices[] = {
+        //     // positions
+        //     -1.0f, 1.0f, -1.0f,
+        //     -1.0f, -1.0f, -1.0f,
+        //     1.0f, -1.0f, -1.0f,
+        //     1.0f, -1.0f, -1.0f,
+        //     1.0f, 1.0f, -1.0f,
+        //     -1.0f, 1.0f, -1.0f,
+
+        //     -1.0f, -1.0f, 1.0f,
+        //     -1.0f, -1.0f, -1.0f,
+        //     -1.0f, 1.0f, -1.0f,
+        //     -1.0f, 1.0f, -1.0f,
+        //     -1.0f, 1.0f, 1.0f,
+        //     -1.0f, -1.0f, 1.0f,
+
+        //     1.0f, -1.0f, -1.0f,
+        //     1.0f, -1.0f, 1.0f,
+        //     1.0f, 1.0f, 1.0f,
+        //     1.0f, 1.0f, 1.0f,
+        //     1.0f, 1.0f, -1.0f,
+        //     1.0f, -1.0f, -1.0f,
+
+        //     -1.0f, -1.0f, 1.0f,
+        //     -1.0f, 1.0f, 1.0f,
+        //     1.0f, 1.0f, 1.0f,
+        //     1.0f, 1.0f, 1.0f,
+        //     1.0f, -1.0f, 1.0f,
+        //     -1.0f, -1.0f, 1.0f,
+
+        //     -1.0f, 1.0f, -1.0f,
+        //     1.0f, 1.0f, -1.0f,
+        //     1.0f, 1.0f, 1.0f,
+        //     1.0f, 1.0f, 1.0f,
+        //     -1.0f, 1.0f, 1.0f,
+        //     -1.0f, 1.0f, -1.0f,
+
+        //     -1.0f, -1.0f, -1.0f,
+        //     -1.0f, -1.0f, 1.0f,
+        //     1.0f, -1.0f, -1.0f,
+        //     1.0f, -1.0f, -1.0f,
+        //     -1.0f, -1.0f, 1.0f,
+        //     1.0f, -1.0f, 1.0f   };
+        // Mint::Ref<Mint::VertexBuffer> skyboxVB = Mint::VertexBuffer::Create(skyboxVertices, sizeof(skyboxVertices));
+        // Mint::BufferLayout skyboxLayout = {
+        //     {Mint::ShaderDataType::Float3, "a_Position"}
+        // };
+        // skyboxVB->SetLayout(skyboxLayout);
+        // m_skybox_vertex_array = Mint::VertexArray::Create();
+        // m_skybox_vertex_array->AddVertexBuffer(skyboxVB);
     }
 
     void OnUpdate(Mint::TimeStep delta_time) override {
@@ -57,33 +119,17 @@ public:
 
         // Mint::LOG_INFO(fmt::format("Delta Time: {0}", delta_time.GetSeconds()));
         // camera movement
-        if (Mint::Input::IsKeyPressed(Mint::Key::W)) {
-            camera_position.y += camera_move_speed * delta_time;
-        }
-        else if(Mint::Input::IsKeyPressed(Mint::Key::S)) {
-            camera_position.y -= camera_move_speed * delta_time;
-        }
-        if (Mint::Input::IsKeyPressed(Mint::Key::A)) {
-            camera_position.x -= camera_move_speed * delta_time;
-        }
-        else if (Mint::Input::IsKeyPressed(Mint::Key::D)) {
-            camera_position.x += camera_move_speed * delta_time;
-        }
 
-        if (Mint::Input::IsKeyPressed(Mint::Key::Q)) {
-            camera_rotation += camera_rotation_speed * delta_time;
-        }
-        else if (Mint::Input::IsKeyPressed(Mint::Key::E)) {
-            camera_rotation -= camera_rotation_speed * delta_time;
-        }
 
         Mint::RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
         Mint::RenderCommand::Clear();
         Mint::RenderCommand::ClearDepth();
 
+        m_camera.OnUpdate(delta_time);
         // m_camera.SetPosition({0.0f, 0.0f, 0.0f});
-        m_camera.SetPosition(camera_position);
-        m_camera.SetRotation_deg(camera_rotation);
+
+        // m_camera.SetPosition(camera_position);
+        // m_camera.SetRotation_deg(camera_rotation);
 
         Mint::RenderSystem::BeginScene(m_camera);
 
@@ -109,6 +155,16 @@ public:
         m_texture_shader->SetInt("u_Texture", 0); // Texture unit 0
         Mint::RenderSystem::Submit(m_texture_shader, m_vertex_array, transform);
 
+        // // render skybox
+        // auto m_skybox_shader = m_shader_library.Get("test_skybox");;
+        // m_skybox_shader->Bind();
+        // m_skybox_texture->Bind(0);
+        // m_skybox_shader->SetInt("u_Skybox", 0); // Texture unit 0
+        // m_skybox_shader->SetMat4("u_View", glm::mat4(glm::mat3(m_camera.GetViewMatrix()))); // remove translation from the view matrix
+        // m_skybox_shader->SetMat4("u_Projection", m_camera.GetProjectionMatrix());
+
+        // Mint::RenderSystem::Submit(m_skybox_shader, m_skybox_vertex_array, glm::mat4(1.0f));
+
         Mint::RenderSystem::EndScene();
     }
 
@@ -121,12 +177,29 @@ public:
         // }
         // Mint::EventDispatcher dispatcher(e);
         // dispatcher.Dispatch<Mint::KeyPressedEvent>(BIND_EVENT_FN(ExampleLayer::OnKeyPressed));
+        m_camera.OnEvent(e);
 
     }
 
     void OnImGuiRender() override {
         ImGui::Begin("Settings");
         ImGui::ColorEdit3("Rectangle Color", glm::value_ptr(rectangle_color));
+
+        ImGui::Separator();
+        ImGui::Text("Camera Debug");
+        auto pos = m_camera.GetPosition();
+        ImGui::Text("Position: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+        ImGui::Text("Distance: %.2f", m_camera.GetDistance());
+        ImGui::Text("Yaw: %.2f, Pitch: %.2f", 
+                    glm::degrees(m_camera.GetYaw()), 
+                    glm::degrees(m_camera.GetPitch()));
+        ImGui::Text("Camera Mode: %s", 
+                    m_camera.GetCameraMode() == Mint::CameraMode::FLYCAM ? "FLYCAM" : "ARCBALL");
+        ImGui::Text("Focus Point: (%.2f, %.2f, %.2f)", 
+                    m_camera.GetFocalPoint().x, 
+                    m_camera.GetFocalPoint().y, 
+                    m_camera.GetFocalPoint().z);
+        
         
         ImGui::End();
     }
@@ -139,13 +212,11 @@ public:
 
     // test
     Mint::Ref<Mint::Texture2D> m_transparent_texture;
+    // Mint::Ref<Mint::VertexArray> m_skybox_vertex_array;
+    // Mint::Ref<Mint::TextureCube> m_skybox_texture;
 
     // camera
-    Mint::Camera m_camera;
-    glm::vec3 camera_position;
-    float camera_rotation;
-    float camera_move_speed = 0.1f;
-    float camera_rotation_speed = 2.0f;
+    Mint::EditorCamera m_camera;
 
     glm::vec3 rectangle_transform;
     glm::vec3 rectangle_color = glm::vec3(0.2f, 0.3f, 0.8f);

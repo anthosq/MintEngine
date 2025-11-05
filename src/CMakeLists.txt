@@ -45,4 +45,5 @@ target_link_libraries(${TARGET_NAME}
         glad
         glm
         stb_image
+        assimp
 )

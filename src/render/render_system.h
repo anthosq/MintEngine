@@ -3,6 +3,7 @@
 #include "render/camera.h"
 #include "render/shader.h"
 #include "Core.h"
+#include "editor/editor_camera.h"
 
 namespace Mint {
 
@@ -10,7 +11,7 @@ namespace Mint {
     public:
         static void Init();
 
-        static void BeginScene(Camera& camera);
+        static void BeginScene(EditorCamera& camera);
 
         static void EndScene();
 

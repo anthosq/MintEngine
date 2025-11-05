@@ -25,6 +25,8 @@
 #include "render/texture.h"
 
 
+#include "editor/editor_camera.h"
+
 // Entry point
 #include "EntryPoint.h"
 // ----- -----

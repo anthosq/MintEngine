@@ -20,7 +20,12 @@ namespace Mint {
         RenderCommand::Init();
     }
 
-    void RenderSystem::BeginScene(Camera& camera) {
+
+
+    // !!TODO: Actually here we need scene camera which responsible for orthographic/perspective projection matrix
+    // Temporary use EditorCamera
+
+    void RenderSystem::BeginScene(EditorCamera& camera) {
         // Prepare something before rendering
         // environment map, cub map sample, camera...
         // projection view matrix, camera space, light

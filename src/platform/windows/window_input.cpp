@@ -7,16 +7,16 @@ namespace Mint {
     
     Input *Input::s_Instance = new WindowInput();
 
-    bool WindowInput::IsKeyPressedImpl(int keycode) {
+    // TODO: 重新实现Input系统, 使其不依赖GLFW的keycode定义
+    bool WindowInput::IsKeyPressedImpl(KeyCode keycode) {
         auto window = static_cast<GLFWwindow*>(Application::GetInstance().GetWindow().GetNativeWindow());
-
-        auto state = glfwGetKey(window, keycode);
+        auto state = glfwGetKey(window, static_cast<int>(keycode));
         return state == GLFW_PRESS || state == GLFW_REPEAT;
     }
 
-    bool WindowInput::IsMouseButtonPressedImpl(int button) {
+    bool WindowInput::IsMouseButtonPressedImpl(MouseCode button) {
         auto window = static_cast<GLFWwindow*>(Application::GetInstance().GetWindow().GetNativeWindow());
-        auto state = glfwGetMouseButton(window, button);
+        auto state = glfwGetMouseButton(window, static_cast<int>(button));
         return state == GLFW_PRESS;
     }
 
