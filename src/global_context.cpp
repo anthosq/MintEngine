@@ -9,7 +9,8 @@ namespace Mint {
 
         m_log_system = std::make_shared<LogSystem>();
         LOG_INFO("Log system initialized.");
-    
+
+        m_render_system = std::make_shared<RenderSystem>();
     }
 
     void RuntimeGlobalContext::shutdownSystems() {
@@ -20,6 +21,8 @@ namespace Mint {
         LOG_INFO("Log system shut down.");
         RefUtils::DumpLiveRefs();
         m_log_system.reset();
+        // m_render_system.shutdown();
+        m_render_system.reset();
     }
 
 }

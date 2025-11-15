@@ -19,32 +19,44 @@ namespace Mint {
     }
     void* RenderCommandQueue::Allocate(RenderCommandFn func, uint32_t size)
     {
-        // attempt to align the command buffer pointer
-        constexpr size_t alignment = alignof(std::max_align_t);
-        size_t space = m_CommandBuffer + 1024 * 1024 * 10 - m_CommandBufferPtr;
-        uint8_t* alignedPtr = (uint8_t*)std::align(alignment, sizeof(RenderCommandFn) + sizeof(uint32_t) + size, (void*&)m_CommandBufferPtr, space);
+        // // attempt to align the command buffer pointer
+        // constexpr size_t alignment = alignof(std::max_align_t);
+        // size_t space = m_CommandBuffer + 1024 * 1024 * 10 - m_CommandBufferPtr;
+        // uint8_t* alignedPtr = (uint8_t*)std::align(alignment, sizeof(RenderCommandFn) + sizeof(uint32_t) + size, (void*&)m_CommandBufferPtr, space);
 
-        if (!alignedPtr) {
-            // TODO: Handle out-of-memory or alignment failure
-            return nullptr;
-        }
+        // if (!alignedPtr) {
+        //     // TODO: Handle out-of-memory or alignment failure
+        //     return nullptr;
+        // }
 
-        uint8_t* cmdPtr = alignedPtr;
+        // uint8_t* cmdPtr = alignedPtr;
 
-        // Store the function pointer
-        *(RenderCommandFn*)cmdPtr = func;
-        cmdPtr += sizeof(RenderCommandFn);
+        // // Store the function pointer
+        // *(RenderCommandFn*)cmdPtr = func;
+        // cmdPtr += sizeof(RenderCommandFn);
 
-        // Store the size
-        *(uint32_t*)cmdPtr = size;
-        cmdPtr += sizeof(uint32_t);
+        // // Store the size
+        // *(uint32_t*)cmdPtr = size;
+        // cmdPtr += sizeof(uint32_t);
 
-        // Store the command data
-        void* dataPtr = (void*)cmdPtr;
-        m_CommandBufferPtr = cmdPtr + size;
+        // // Store the command data
+        // void* dataPtr = (void*)cmdPtr;
+        // m_CommandBufferPtr = cmdPtr + size;
 
-        m_CommandCount++;
-        return dataPtr;
+        // m_CommandCount++;
+        // return dataPtr;
+        
+		*(RenderCommandFn*)m_CommandBufferPtr = func;
+		m_CommandBufferPtr += sizeof(RenderCommandFn);
+
+		*(uint32_t*)m_CommandBufferPtr = size;
+		m_CommandBufferPtr += sizeof(uint32_t);
+
+		void* memory = m_CommandBufferPtr;
+		m_CommandBufferPtr += size;
+
+		m_CommandCount++;
+		return memory;
     }
 
     void RenderCommandQueue::Execute()
@@ -65,6 +77,6 @@ namespace Mint {
         // Reset the command buffer
         m_CommandBufferPtr = m_CommandBuffer;
         m_CommandCount = 0;
-    }
+	}
 
 }

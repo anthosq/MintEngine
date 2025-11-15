@@ -37,6 +37,7 @@ namespace Mint {
 
     private:
         bool OnWindowClose(WindowCloseEvent& e);
+        bool OnWindowResize(WindowResizeEvent& e);
         std::unique_ptr<Window> m_window;
         ImGuiLayer* m_imgui_layer;
         bool m_running = true;
@@ -44,6 +45,9 @@ namespace Mint {
         static Application* s_instance;
         // float m_last_tick_time = 0.0f;
         std::chrono::steady_clock::time_point m_last_tick_time = std::chrono::steady_clock::now();
+
+        // temporary
+        bool m_minimized = false;
 
     };
 

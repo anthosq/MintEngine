@@ -7,9 +7,9 @@
 namespace Mint {
     Ref<Shader> Shader::Create(const std::filesystem::path &filepath) {
         // Here we can add support for different rendering APIs in the future
-        switch (RendererAPI::GetAPI()) {
-            case RendererAPI::API::None:            return nullptr;
-            case RendererAPI::API::OpenGL:          return Ref<OpenGLShader>::Create(filepath);
+        switch (RendererAPI::GetAPIType()) {
+            case RendererAPI::RenderAPIType::None:            return nullptr;
+            case RendererAPI::RenderAPIType::OpenGL:          return Ref<OpenGLShader>::Create(filepath);
         }
 
         return nullptr;

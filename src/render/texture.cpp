@@ -7,10 +7,10 @@
 
 namespace Mint {
     Ref<Texture2D> Texture2D::Create(const TextureSpecification& spec, const std::filesystem::path& path) {
-        switch (RendererAPI::GetAPI()) {
-            case RendererAPI::API::None:            return nullptr;
+        switch (RendererAPI::GetAPIType()) {
+            case RendererAPI::RenderAPIType::None:            return nullptr;
             // case RendererAPI::API::OpenGL:          return Ref<OpenGLTexture2D>::CreateFromFile(spec, path);
-            case RendererAPI::API::OpenGL:          return Ref<OpenGLTexture2D>::Create(spec, path);
+            case RendererAPI::RenderAPIType::OpenGL:          return Ref<OpenGLTexture2D>::Create(spec, path);
         }
 
         // MINT_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -18,9 +18,9 @@ namespace Mint {
     }
 
     Ref<Texture2D> Texture2D::Create(const TextureSpecification& spec) {
-        switch (RendererAPI::GetAPI()) {
-            case RendererAPI::API::None:            return nullptr;
-            case RendererAPI::API::OpenGL:          return Ref<OpenGLTexture2D>::Create(spec);
+        switch (RendererAPI::GetAPIType()) {
+            case RendererAPI::RenderAPIType::None:            return nullptr;
+            case RendererAPI::RenderAPIType::OpenGL:          return Ref<OpenGLTexture2D>::Create(spec);
         }
 
         // MINT_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -28,9 +28,9 @@ namespace Mint {
     }
 
     Ref<TextureCube> TextureCube::Create(const TextureSpecification& spec, const std::filesystem::path& path) {
-        switch (RendererAPI::GetAPI()) {
-            case RendererAPI::API::None:            return nullptr;
-            case RendererAPI::API::OpenGL:          // TODO: 实现OpenGLTextureCube类
+        switch (RendererAPI::GetAPIType()) {
+            case RendererAPI::RenderAPIType::None:            return nullptr;
+            case RendererAPI::RenderAPIType::OpenGL:          // TODO: 实现OpenGLTextureCube类
                                                     return Ref<OpenGLTextureCube>::Create(spec, path);
         }
 

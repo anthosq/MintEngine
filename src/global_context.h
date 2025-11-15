@@ -24,6 +24,7 @@ namespace Mint {
 
         std::shared_ptr<Mint::Application> m_application;
         std::shared_ptr<Mint::LogSystem> m_log_system;
+        std::shared_ptr<Mint::RenderSystem> m_render_system;
 
     };
 

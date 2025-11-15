@@ -5,7 +5,7 @@
 namespace Mint {
     class RendererAPI {
         public:
-            enum class API
+            enum class RenderAPIType
             {
                 None = 0,
                 OpenGL = 1,
@@ -15,14 +15,14 @@ namespace Mint {
             virtual void Init() = 0;
 
             virtual void Clear() = 0;
-            virtual void ClearDepth() = 0;
 
-            virtual void SetClearColor(const glm::vec4& color) = 0;
+            virtual void Clear(const glm::vec4& color) = 0;
 
-            virtual void DrawIndexed(const Ref<VertexArray>& vertexArray) = 0;
-        
-            inline static API GetAPI() { return s_api; }
+            // !TODO: change to accept count and depth test flag
+            virtual void DrawIndexed(unsigned int count, bool depthTest = true) = 0;
+
+            inline static RenderAPIType GetAPIType() { return s_api_type; }
         private:
-            static API s_api;
+            inline static RenderAPIType s_api_type = RendererAPI::RenderAPIType::OpenGL;
     };
 }

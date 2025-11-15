@@ -6,9 +6,9 @@ namespace Mint {
     Ref<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size) {
         // 这里后续可以根据RHI的不同, 创建不同的实现类
         switch (RenderSystem::GetAPI()) {
-            case RendererAPI::API::None:
+            case RendererAPI::RenderAPIType::None:
                 return nullptr;
-            case RendererAPI::API::OpenGL:
+            case RendererAPI::RenderAPIType::OpenGL:
                 return Ref<OpenGLVertexBuffer>::Create(vertices, size);
             default:
                 return nullptr;
@@ -17,9 +17,9 @@ namespace Mint {
 
     Ref<VertexBuffer> VertexBuffer::Create(uint32_t size) {
         switch (RenderSystem::GetAPI()) {
-            case RendererAPI::API::None:
+            case RendererAPI::RenderAPIType::None:
                 return nullptr;
-            case RendererAPI::API::OpenGL:
+            case RendererAPI::RenderAPIType::OpenGL:
                 return  Ref<OpenGLVertexBuffer>::Create(size);
             default:
                 return nullptr;
@@ -29,9 +29,9 @@ namespace Mint {
 
     Ref<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count) {
         switch (RenderSystem::GetAPI()) {
-            case RendererAPI::API::None:
+            case RendererAPI::RenderAPIType::None:
                 return nullptr;
-            case RendererAPI::API::OpenGL:
+            case RendererAPI::RenderAPIType::OpenGL:
                 return Ref<OpenGLIndexBuffer>::Create(indices, count);
             default:
                 return nullptr;

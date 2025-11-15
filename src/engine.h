@@ -17,7 +17,6 @@
 
 // render related
 #include "render/render_system.h"
-#include "render/render_command.h"
 #include "render/shader.h"
 #include "render/buffer.h"
 #include "render/vertex_array.h"

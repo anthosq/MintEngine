@@ -16,22 +16,24 @@ namespace Mint {
     }
 
     void OpenGLRendererAPI::Clear() {
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    void OpenGLRendererAPI::ClearDepth() {
-        glClear(GL_DEPTH_BUFFER_BIT);
-    }
 
-    void OpenGLRendererAPI::SetClearColor(const glm::vec4& color) {
+    void OpenGLRendererAPI::Clear(const glm::vec4& color) {
         glClearColor(color.r, color.g, color.b, color.a);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
  
-    void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray) {
-        // 让下一个绘制覆盖VAO
-        // 需要重构以支持skybox
-        vertexArray->Bind();
-        auto indexbuffer = vertexArray->GetIndexBuffer();
-        glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+    void OpenGLRendererAPI::DrawIndexed(unsigned int count, bool depth_test) {
+        if (!depth_test) {
+            glDisable(GL_DEPTH_TEST);
+        } 
+
+        glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
+
+        if (!depth_test) {
+            glEnable(GL_DEPTH_TEST);
+        }
     }
 }

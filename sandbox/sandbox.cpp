@@ -120,10 +120,9 @@ public:
         // Mint::LOG_INFO(fmt::format("Delta Time: {0}", delta_time.GetSeconds()));
         // camera movement
 
+        
 
-        Mint::RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
-        Mint::RenderCommand::Clear();
-        Mint::RenderCommand::ClearDepth();
+        Mint::g_runtime_global_context.m_render_system->Clear({0.1f, 0.1f, 0.1f, 1});
 
         m_camera.OnUpdate(delta_time);
         // m_camera.SetPosition({0.0f, 0.0f, 0.0f});
@@ -131,7 +130,7 @@ public:
         // m_camera.SetPosition(camera_position);
         // m_camera.SetRotation_deg(camera_rotation);
 
-        Mint::RenderSystem::BeginScene(m_camera);
+        Mint::g_runtime_global_context.m_render_system->BeginScene(m_camera);
 
         // temporary transform function
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), rectangle_transform);
@@ -149,11 +148,11 @@ public:
         m_texture->Bind();
         auto m_texture_shader = m_shader_library.Get("test_texture");
         m_texture_shader->SetInt("u_Texture", 0); // Texture unit 0
-        Mint::RenderSystem::Submit(m_texture_shader, m_vertex_array, transform);
+        Mint::g_runtime_global_context.m_render_system->Submit(m_texture_shader, m_vertex_array, transform);
 
         m_transparent_texture->Bind();
         m_texture_shader->SetInt("u_Texture", 0); // Texture unit 0
-        Mint::RenderSystem::Submit(m_texture_shader, m_vertex_array, transform);
+        Mint::g_runtime_global_context.m_render_system->Submit(m_texture_shader, m_vertex_array, transform);
 
         // // render skybox
         // auto m_skybox_shader = m_shader_library.Get("test_skybox");;
@@ -165,7 +164,7 @@ public:
 
         // Mint::RenderSystem::Submit(m_skybox_shader, m_skybox_vertex_array, glm::mat4(1.0f));
 
-        Mint::RenderSystem::EndScene();
+        Mint::g_runtime_global_context.m_render_system->EndScene();
     }
 
     void OnEvent(Mint::Event& e) override {

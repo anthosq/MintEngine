@@ -6,9 +6,9 @@
 namespace Mint {
     Ref<VertexArray> VertexArray::Create() {
         switch (RenderSystem::GetAPI()) {
-            case RendererAPI::API::None:
+            case RendererAPI::RenderAPIType::None:
                 return nullptr;
-            case RendererAPI::API::OpenGL:
+            case RendererAPI::RenderAPIType::OpenGL:
                 return Ref<OpenGLVertexArray>::Create();
             default:
                 return nullptr;

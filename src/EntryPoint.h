@@ -21,7 +21,6 @@ int main() {
     // Mint::LOG_DEBUG("This is a debug message.");
     // Mint::LOG_FATAL("This is a fatal message.");
     Mint::LOG_INFO("Mint Engine started.");
-
     Mint::g_runtime_global_context.m_application->Run();
     return 0;
 }

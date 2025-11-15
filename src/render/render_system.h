@@ -1,5 +1,6 @@
 #pragma once
-#include "render/render_command.h"
+#include "render/renderer_api.h"
+#include "render/render_command_queue.h"
 #include "render/camera.h"
 #include "render/shader.h"
 #include "Core.h"
@@ -9,21 +10,75 @@ namespace Mint {
 
     class RenderSystem {
     public:
-        static void Init();
+        typedef void(*RenderCommandFn)(void*);
 
-        static void BeginScene(EditorCamera& camera);
+        // move from render_command
+        // In the future: RenderSystem也不持有submit, submit属于RHI层的内容, RenderSystem持有Pipeline
 
-        static void EndScene();
+        void Clear();
+        // temporary
+        void Clear(const glm::vec4& color);
+
+		void DrawIndexed(uint32_t count, bool depthTest = true);
+
+		void Init();
+
+        const std::unique_ptr<ShaderLibrary>& GetShaderLibrary() { return Get_Renderer().m_shaderLibrary; }
+
+        template<typename FuncT>
+        inline void Submit(FuncT&& func) {
+            auto renderCmd = [](void* ptr) {
+                auto pFunc = (FuncT*)ptr;
+                (*pFunc)();
+
+                pFunc->~FuncT();
+            };
+
+            // bad design, need to fix
+            // need to modify vertexbuffers and so 
+            void* storageBuffer = m_renderer->m_commandQueue.Allocate(renderCmd, sizeof(func));
+            new (storageBuffer) FuncT(std::forward<FuncT>(func));
+        }
+
+        void WaitAndRender();
+
+        void BeginScene(EditorCamera& camera);
+
+        void EndScene();
+
+        void OnWindowResize(uint32_t width, uint32_t height);
 
         // temporary adding Transform
-        static void Submit(Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transform = glm::mat4(1.0f));
+        void Submit(Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transform = glm::mat4(1.0f));
 
-        static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
+        static RendererAPI::RenderAPIType GetAPI() { return RendererAPI::GetAPIType(); }
+
+        static RenderSystem& Get_Renderer() { return *m_renderer; }
+
+        // preparing RenderPass. or maybe render pipeline
+		// static void BeginRenderPass(const Ref<RenderPass>& renderPass);
+		// static void EndRenderPass();
+
+        // after complete reconstructing rendersystem
+        void SubmitMesh() { m_renderer->SubmitMeshImpl(); };
+        // not sure, I don't think RendererAPI should based on Ref
+        std::shared_ptr<RendererAPI> GetRendererAPI() { return m_rendererAPI; }
+
     private:
+        void SubmitMeshImpl() {};
+
+    private:
+        static RenderSystem* m_renderer;
+
+    private:
+        RenderCommandQueue m_commandQueue;
+        std::unique_ptr<ShaderLibrary> m_shaderLibrary;
+        std::shared_ptr<RendererAPI> m_rendererAPI;
 
         struct SceneData {
             glm::mat4 viewProjectionMatrix;
         };
         static SceneData* m_sceneData;
+
     };
 }
