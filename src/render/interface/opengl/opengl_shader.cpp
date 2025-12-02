@@ -5,13 +5,16 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <fstream>
 
+#include "render/render_system.h"
 
 namespace Mint {
     OpenGLShader::OpenGLShader(const std::filesystem::path& filepath)
         : m_asset_path(filepath.string()) {
         m_name = filepath.filename().string();
         ReadShaderFromFile(filepath);
-        CompileAndUploadShader();
+        RenderSystem::Submit([this]() {
+            CompileAndUploadShader();
+        });
     }
 
     void OpenGLShader::ReadShaderFromFile(const std::filesystem::path& filepath) {
@@ -136,15 +139,21 @@ namespace Mint {
     }
 
     OpenGLShader::~OpenGLShader() {
-        glDeleteProgram(m_renderer_id);
+        RenderSystem::Submit([this]() {
+            glDeleteProgram(m_renderer_id);
+        });
     }
 
     void OpenGLShader::Bind() const {
-        glUseProgram(m_renderer_id);
+        RenderSystem::Submit([this]() {
+            glUseProgram(m_renderer_id);
+        });
     }
 
     void OpenGLShader::Unbind() const {
-        glUseProgram(0);
+        RenderSystem::Submit([]() {
+            glUseProgram(0);
+        });
     }
 
     // wrapper functions
@@ -176,39 +185,54 @@ namespace Mint {
     }
 
 
+    // 后续整合在一起, 在ResolveAndSetUniform中调用
     void OpenGLShader::UploadUniformInt(const std::string& name, int value) {
         GLint Location = glGetUniformLocation(m_renderer_id,  name.c_str());
-        glUniform1i(Location, value);
+        RenderSystem::Submit([Location, value]() {
+            glUniform1i(Location, value);
+        });
     }
 
     void OpenGLShader::UploadUniformFloat(const std::string& name, float value) {
         GLint Location = glGetUniformLocation(m_renderer_id, name.c_str());
-        glUniform1f(Location, value);
+        RenderSystem::Submit([Location, value]() {
+            glUniform1f(Location, value);
+        });
     }
 
     void OpenGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& vector) {
         GLint Location = glGetUniformLocation(m_renderer_id, name.c_str());
-        glUniform2fv(Location, 1, glm::value_ptr(vector));
+        RenderSystem::Submit([Location, vector]() {
+            glUniform2fv(Location, 1, glm::value_ptr(vector));
+        });
     }
 
     void OpenGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& vector) {
         GLint Location = glGetUniformLocation(m_renderer_id, name.c_str());
-        glUniform3fv(Location, 1, glm::value_ptr(vector));
+        RenderSystem::Submit([Location, vector]() {
+            glUniform3fv(Location, 1, glm::value_ptr(vector));
+        });
     }
 
     void OpenGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4& vector) {
         GLint Location = glGetUniformLocation(m_renderer_id, name.c_str());
-        glUniform4fv(Location, 1, glm::value_ptr(vector));
+        RenderSystem::Submit([Location, vector]() {
+            glUniform4fv(Location, 1, glm::value_ptr(vector));
+        });
     }
 
 
     void OpenGLShader::UploadUniformMat3(const std::string& name, const glm::mat3& matrix) {
         GLint Location = glGetUniformLocation(m_renderer_id, name.c_str());
-        glUniformMatrix3fv(Location, 1, GL_FALSE, glm::value_ptr(matrix));
+        RenderSystem::Submit([Location, matrix]() {
+            glUniformMatrix3fv(Location, 1, GL_FALSE, glm::value_ptr(matrix));
+        });
     }
 
     void OpenGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix) {
         GLint Location = glGetUniformLocation(m_renderer_id, name.c_str());
-        glUniformMatrix4fv(Location, 1, GL_FALSE, glm::value_ptr(matrix));
+        RenderSystem::Submit([Location, matrix]() {
+            glUniformMatrix4fv(Location, 1, GL_FALSE, glm::value_ptr(matrix));
+        });
     }
 }

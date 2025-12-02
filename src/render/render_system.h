@@ -26,7 +26,7 @@ namespace Mint {
         const std::unique_ptr<ShaderLibrary>& GetShaderLibrary() { return Get_Renderer().m_shaderLibrary; }
 
         template<typename FuncT>
-        inline void Submit(FuncT&& func) {
+        static void Submit(FuncT&& func) {
             auto renderCmd = [](void* ptr) {
                 auto pFunc = (FuncT*)ptr;
                 (*pFunc)();
@@ -35,7 +35,7 @@ namespace Mint {
             };
 
             // bad design, need to fix
-            // need to modify vertexbuffers and so 
+            // need to modify vertexbuffers and so on
             void* storageBuffer = m_renderer->m_commandQueue.Allocate(renderCmd, sizeof(func));
             new (storageBuffer) FuncT(std::forward<FuncT>(func));
         }

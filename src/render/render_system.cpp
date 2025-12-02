@@ -85,12 +85,13 @@ namespace Mint {
     // move submit to render command, receiving lambda
     void RenderSystem::Submit(Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transform) {
         // not sure
+        glm::mat4 viewProj = m_sceneData->viewProjectionMatrix;
         shader->Bind();
-        shader->SetMat4("u_ViewProjection", m_sceneData->viewProjectionMatrix);
+        shader->SetMat4("u_ViewProjection", viewProj);
         // Model matrix
         shader->SetMat4("u_Transform", transform);
         vertex_array->Bind();
-        m_rendererAPI->DrawIndexed(vertex_array->GetIndexBuffer()->GetCount());
+        DrawIndexed(vertex_array->GetIndexBuffer()->GetCount());
     }
 
 }

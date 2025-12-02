@@ -1,6 +1,7 @@
 #include "opengl_texture.h"
 #include "render/interface/opengl/gl_common.h"
 #include "render/interface/opengl/opengl_utils.h"
+#include "render/render_system.h"
 
 #include "log_system.h"
 
@@ -10,13 +11,15 @@ namespace Mint {
     // temporary implementation
     OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification& spec)
         : m_specification(spec), m_isLoaded(false) {
-            // generate empty texture
-            glCreateTextures(GL_TEXTURE_2D, 1, &m_rendererID);
-            glTextureStorage2D(m_rendererID, 1, Utils::ToGLTextureFormat(m_specification.Format), m_specification.Width, m_specification.Height);
-            glTextureParameteri(m_rendererID, GL_TEXTURE_MIN_FILTER, Utils::ToGLTextureFilter(m_specification.MinFilter));
-            glTextureParameteri(m_rendererID, GL_TEXTURE_MAG_FILTER, Utils::ToGLTextureFilter(m_specification.MagFilter));
-            glTextureParameteri(m_rendererID, GL_TEXTURE_WRAP_S, Utils::ToGLTextureWrap(m_specification.WrapS));
-            glTextureParameteri(m_rendererID, GL_TEXTURE_WRAP_T, Utils::ToGLTextureWrap(m_specification.WrapT));
+            RenderSystem::Submit([this]() {
+                // generate empty texture
+                glCreateTextures(GL_TEXTURE_2D, 1, &m_rendererID);
+                glTextureStorage2D(m_rendererID, 1, Utils::ToGLTextureFormat(m_specification.Format), m_specification.Width, m_specification.Height);
+                glTextureParameteri(m_rendererID, GL_TEXTURE_MIN_FILTER, Utils::ToGLTextureFilter(m_specification.MinFilter));
+                glTextureParameteri(m_rendererID, GL_TEXTURE_MAG_FILTER, Utils::ToGLTextureFilter(m_specification.MagFilter));
+                glTextureParameteri(m_rendererID, GL_TEXTURE_WRAP_S, Utils::ToGLTextureWrap(m_specification.WrapS));
+                glTextureParameteri(m_rendererID, GL_TEXTURE_WRAP_T, Utils::ToGLTextureWrap(m_specification.WrapT));
+            });
     }
 
     OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification& spec, const std::filesystem::path& path)
@@ -54,19 +57,22 @@ namespace Mint {
         // LOG_INFO(fmt::format("Loaded texture {0} ({1}x{2}, {3} channels)", path.string(), width, height, channels));
         // LOG_INFO(fmt::format("Inferred format: internalFormat={0}, dataFormat={1}", internalFormat, dataFormat));
 
-        glCreateTextures(GL_TEXTURE_2D, 1, &m_rendererID);
-        glTextureStorage2D(m_rendererID, 1, internalFormat, m_specification.Width, m_specification.Height);
+        RenderSystem::Submit([this, internalFormat, dataFormat, data]()
+                             {
+            glCreateTextures(GL_TEXTURE_2D, 1, &m_rendererID);
+            glTextureStorage2D(m_rendererID, 1, internalFormat, m_specification.Width, m_specification.Height);
 
-        // currently without mipmaps
-        glTextureParameteri(m_rendererID, GL_TEXTURE_MIN_FILTER, Utils::ToGLTextureFilter(m_specification.MinFilter));
-        glTextureParameteri(m_rendererID, GL_TEXTURE_MAG_FILTER, Utils::ToGLTextureFilter(m_specification.MagFilter));
+            // currently without mipmaps
+            glTextureParameteri(m_rendererID, GL_TEXTURE_MIN_FILTER, Utils::ToGLTextureFilter(m_specification.MinFilter));
+            glTextureParameteri(m_rendererID, GL_TEXTURE_MAG_FILTER, Utils::ToGLTextureFilter(m_specification.MagFilter));
 
-        glTextureSubImage2D(m_rendererID, 0, 0, 0, m_specification.Width, m_specification.Height,
-                            dataFormat, GL_UNSIGNED_BYTE, data);
+            glTextureSubImage2D(m_rendererID, 0, 0, 0, m_specification.Width, m_specification.Height,
+                                dataFormat, GL_UNSIGNED_BYTE, data);
 
-        if (m_specification.GenerateMipMaps) {
-            glGenerateTextureMipmap(m_rendererID);
-        }
+            if (m_specification.GenerateMipMaps) {
+                glGenerateTextureMipmap(m_rendererID);
+            }
+        });
 
         stbi_image_free(data);
     }
@@ -74,11 +80,15 @@ namespace Mint {
 
 
     OpenGLTexture2D::~OpenGLTexture2D() {
-        glDeleteTextures(1, &m_rendererID);
+        RenderSystem::Submit([this]() {
+            glDeleteTextures(1, &m_rendererID);
+        });
     }
 
     void OpenGLTexture2D::Bind(uint32_t slot) const {
-        glBindTextureUnit(slot, m_rendererID);
+        RenderSystem::Submit([this, slot]() {
+            glBindTextureUnit(slot, m_rendererID);
+        });
     }
 
     // OpenGLTextureCube implementation would go here
