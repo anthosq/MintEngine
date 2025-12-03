@@ -4,6 +4,8 @@
 #include "stb_image.h"
 #include <string>
 
+#include "core/buffer.h"
+
 namespace Mint{
     class OpenGLTexture2D : public Texture2D {
     public:
@@ -30,6 +32,7 @@ namespace Mint{
         std::filesystem::path m_path;
         unsigned int m_rendererID;
         TextureSpecification m_specification;
+        Buffer m_image_data;
 
         // TODO: 后续完善Asset系统, 通过存储的Image判断是否载入
         bool m_isLoaded;

@@ -158,81 +158,81 @@ namespace Mint {
 
     // wrapper functions
     void OpenGLShader::SetInt(const std::string& name, int value) {
-        UploadUniformInt(name, value);
+        RenderSystem::Submit([=]() {
+            UploadUniformInt(name, value);
+        });
     }
 
     void OpenGLShader::SetFloat(const std::string& name, float value) {
-        UploadUniformFloat(name, value);
+        RenderSystem::Submit([=]() {
+            UploadUniformFloat(name, value);
+        });
     }
 
     void OpenGLShader::SetFloat2(const std::string& name, const glm::vec2& vector) {
-        UploadUniformFloat2(name, vector);
+        RenderSystem::Submit([=]() {
+            UploadUniformFloat2(name, vector);
+        });
     }
 
     void OpenGLShader::SetFloat3(const std::string& name, const glm::vec3& vector) {
-        UploadUniformFloat3(name, vector);
+        RenderSystem::Submit([=]() {
+            UploadUniformFloat3(name, vector);
+        });
     }
 
     void OpenGLShader::SetFloat4(const std::string& name, const glm::vec4& vector) {
-        UploadUniformFloat4(name, vector);
+        RenderSystem::Submit([=]() {
+            UploadUniformFloat4(name, vector);
+        });
     }
     void OpenGLShader::SetMat3(const std::string& name, const glm::mat3& matrix) {
-        UploadUniformMat3(name, matrix);
+        RenderSystem::Submit([=]() {
+            UploadUniformMat3(name, matrix);
+        });
     }
     
     void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& matrix) {
-        UploadUniformMat4(name, matrix);
+        RenderSystem::Submit([=]() {
+            UploadUniformMat4(name, matrix);
+        });
     }
 
 
     // 后续整合在一起, 在ResolveAndSetUniform中调用
     void OpenGLShader::UploadUniformInt(const std::string& name, int value) {
-        GLint Location = glGetUniformLocation(m_renderer_id,  name.c_str());
-        RenderSystem::Submit([Location, value]() {
-            glUniform1i(Location, value);
-        });
+        GLint Location = glGetUniformLocation(m_renderer_id, name.c_str());
+        glUniform1i(Location, value);
     }
 
     void OpenGLShader::UploadUniformFloat(const std::string& name, float value) {
         GLint Location = glGetUniformLocation(m_renderer_id, name.c_str());
-        RenderSystem::Submit([Location, value]() {
-            glUniform1f(Location, value);
-        });
+        glUniform1f(Location, value);
     }
 
     void OpenGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& vector) {
         GLint Location = glGetUniformLocation(m_renderer_id, name.c_str());
-        RenderSystem::Submit([Location, vector]() {
-            glUniform2fv(Location, 1, glm::value_ptr(vector));
-        });
+        glUniform2fv(Location, 1, glm::value_ptr(vector));
     }
 
     void OpenGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& vector) {
         GLint Location = glGetUniformLocation(m_renderer_id, name.c_str());
-        RenderSystem::Submit([Location, vector]() {
-            glUniform3fv(Location, 1, glm::value_ptr(vector));
-        });
+        glUniform3fv(Location, 1, glm::value_ptr(vector));
     }
 
     void OpenGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4& vector) {
         GLint Location = glGetUniformLocation(m_renderer_id, name.c_str());
-        RenderSystem::Submit([Location, vector]() {
-            glUniform4fv(Location, 1, glm::value_ptr(vector));
-        });
+        glUniform4fv(Location, 1, glm::value_ptr(vector));
     }
 
 
     void OpenGLShader::UploadUniformMat3(const std::string& name, const glm::mat3& matrix) {
         GLint Location = glGetUniformLocation(m_renderer_id, name.c_str());
-        RenderSystem::Submit([Location, matrix]() {
-            glUniformMatrix3fv(Location, 1, GL_FALSE, glm::value_ptr(matrix));
-        });
+        glUniformMatrix3fv(Location, 1, GL_FALSE, glm::value_ptr(matrix));
     }
 
     void OpenGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix) {
         GLint Location = glGetUniformLocation(m_renderer_id, name.c_str());
-        RenderSystem::Submit([Location, matrix]() {
-            glUniformMatrix4fv(Location, 1, GL_FALSE, glm::value_ptr(matrix));
-        });
+        glUniformMatrix4fv(Location, 1, GL_FALSE, glm::value_ptr(matrix));
     }
 }

@@ -37,7 +37,7 @@ public:
 
         // index buffer
         unsigned int indices[6] = {0, 1, 2, 0, 3, 2};
-        m_index_buffer = Mint::IndexBuffer::Create(indices, 6);
+        m_index_buffer = Mint::IndexBuffer::Create(indices, 6 * sizeof(unsigned int));
         m_vertex_array->SetIndexBuffer(m_index_buffer);
 
         // shader wrap seems completed

@@ -11,6 +11,7 @@ namespace Mint {
     // temporary implementation
     OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification& spec)
         : m_specification(spec), m_isLoaded(false) {
+            auto self = this;
             RenderSystem::Submit([this]() {
                 // generate empty texture
                 glCreateTextures(GL_TEXTURE_2D, 1, &m_rendererID);
@@ -32,9 +33,9 @@ namespace Mint {
     void OpenGLTexture2D::CreateFromFile(const TextureSpecification& spec, const std::filesystem::path& path) {
         int width, height, channels;
         stbi_set_flip_vertically_on_load(1);
-        stbi_uc* data = stbi_load(path.string().c_str(), &width, &height, &channels, 0);
+        m_image_data.Data = stbi_load(path.string().c_str(), &width, &height, &channels, 0);
 
-        if (!data) {
+        if (!m_image_data.Data) {
             m_isLoaded = false;
             LOG_ERROR(fmt::format("Failed to load texture image from path: {0}", path.string()));
             return;
@@ -57,7 +58,7 @@ namespace Mint {
         // LOG_INFO(fmt::format("Loaded texture {0} ({1}x{2}, {3} channels)", path.string(), width, height, channels));
         // LOG_INFO(fmt::format("Inferred format: internalFormat={0}, dataFormat={1}", internalFormat, dataFormat));
 
-        RenderSystem::Submit([this, internalFormat, dataFormat, data]()
+        RenderSystem::Submit([this, internalFormat, dataFormat]()
                              {
             glCreateTextures(GL_TEXTURE_2D, 1, &m_rendererID);
             glTextureStorage2D(m_rendererID, 1, internalFormat, m_specification.Width, m_specification.Height);
@@ -67,14 +68,13 @@ namespace Mint {
             glTextureParameteri(m_rendererID, GL_TEXTURE_MAG_FILTER, Utils::ToGLTextureFilter(m_specification.MagFilter));
 
             glTextureSubImage2D(m_rendererID, 0, 0, 0, m_specification.Width, m_specification.Height,
-                                dataFormat, GL_UNSIGNED_BYTE, data);
+                                dataFormat, GL_UNSIGNED_BYTE, m_image_data.Data);
 
             if (m_specification.GenerateMipMaps) {
                 glGenerateTextureMipmap(m_rendererID);
             }
+            stbi_image_free(m_image_data.Data);
         });
-
-        stbi_image_free(data);
     }
 
 

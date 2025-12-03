@@ -27,12 +27,12 @@ namespace Mint {
     }
 
 
-    Ref<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count) {
+    Ref<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t size) {
         switch (RenderSystem::GetAPI()) {
             case RendererAPI::RenderAPIType::None:
                 return nullptr;
             case RendererAPI::RenderAPIType::OpenGL:
-                return Ref<OpenGLIndexBuffer>::Create(indices, count);
+                return Ref<OpenGLIndexBuffer>::Create(indices, size);
             default:
                 return nullptr;
         }

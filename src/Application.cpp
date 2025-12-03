@@ -74,11 +74,8 @@ namespace Mint {
             }
 
             // On the render
-            m_imgui_layer->Begin();
-            for (Layer* layer : m_layer_stack) {
-                layer->OnImGuiRender();
-            }
-            m_imgui_layer->End();
+            RenderSystem::Submit([this]() { this->OnImGuiRender(); });
+
             // auto [x,y] = Input::GetMousePosition();
             // LOG_INFO(fmt::format("Mouse Position: ({0}, {1})", x, y));
             g_runtime_global_context.m_render_system->WaitAndRender();
@@ -87,6 +84,13 @@ namespace Mint {
         g_runtime_global_context.shutdownSystems();
     }
 
+    void Application::OnImGuiRender() {
+        m_imgui_layer->Begin();
+        for (Layer* layer : m_layer_stack) {
+            layer->OnImGuiRender();
+        }
+        m_imgui_layer->End();
+    }
 
     bool Application::OnWindowClose(WindowCloseEvent &e)
     {

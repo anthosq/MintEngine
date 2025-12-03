@@ -2,6 +2,7 @@
 #include <cstdint>
 #include "render/buffer.h"
 #include "render/interface/opengl/gl_common.h"
+#include "core/buffer.h"
 
 namespace Mint {
     class OpenGLVertexBuffer : public VertexBuffer {
@@ -20,7 +21,11 @@ namespace Mint {
 
     private:
         uint32_t m_renderer_id;
+        uint32_t m_size;
         BufferLayout m_layout;
+        
+
+        Buffer m_local_data;
     };
 
     class OpenGLIndexBuffer : public IndexBuffer {
@@ -37,5 +42,8 @@ namespace Mint {
     private:
         uint32_t m_renderer_id;
         uint32_t m_count;
+        uint32_t m_size;
+
+        Buffer m_local_data;
     };
 }
