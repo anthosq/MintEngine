@@ -14,19 +14,75 @@
 
 namespace Mint {
     // temporary mesh class
+#define MAX_BONE_INFLUENCE 4
+
     struct Vertex {
         glm::vec3 Position;
         glm::vec3 Normal;
         glm::vec3 Tangent;
-        glm::vec3 Binormal;
-        glm::vec2 TexCoord;
+        glm::vec3 Bitangent;
+        glm::vec2 TexCoords;
     };
 
+    struct AnimatedVertex {
+        glm::vec3 Position;
+        glm::vec3 Normal;
+        glm::vec2 TexCoords;
+        glm::vec3 Tangent;
+        glm::vec3 Bitangent;
 
-    struct Index
-    {
+        uint32_t BoneIDs[MAX_BONE_INFLUENCE] = {0, 0, 0, 0};
+        float Weights[MAX_BONE_INFLUENCE] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+        void AddBoneData(uint32_t BoneID, float Weight) {
+            for (size_t i = 0; i < MAX_BONE_INFLUENCE; i++) {
+                if (Weights[i] == 0.0f) {
+                    BoneIDs[i] = BoneID;
+                    Weights[i] = Weight;
+                    return;
+                }
+            }
+            // should never get here - more bones than we have space for
+            // assert(false && "Too many bones for vertex!");
+        }
+    };
+
+    static const int num_attributes = 5;
+    struct Index {
         uint32_t V1, V2, V3;
     };
+
+    static_assert(sizeof(Index) == 3 * sizeof(uint32_t));
+
+
+    // later need to consider serialization & MeshFactory
+    struct BoneInfo {
+        glm::mat4 BoneOffset;
+        glm::mat4 FinalTransformation;
+    };
+
+    struct VertexBoneData {
+        uint32_t BoneIDs[MAX_BONE_INFLUENCE];
+        float Weights[MAX_BONE_INFLUENCE];
+
+        VertexBoneData() {
+            memset(BoneIDs, 0, sizeof(BoneIDs));
+            memset(Weights, 0, sizeof(Weights));
+        }
+
+        void AddBoneData(uint32_t BoneID, float Weight) {
+            for (size_t i = 0; i < MAX_BONE_INFLUENCE; i++) {
+                if (Weights[i] == 0.0f) {
+                    BoneIDs[i] = BoneID;
+                    Weights[i] = Weight;
+                    return;
+                }
+            }
+            // should never get here - more bones than we have space for
+            // assert(false && "Too many bones for vertex!");
+        }
+    };
+
 
     class SubMesh {
     public:
@@ -34,14 +90,18 @@ namespace Mint {
         uint32_t BaseIndex;
         uint32_t MaterialIndex;
         uint32_t IndexCount;
-        uint32_t VertexCount;
+        // uint32_t VertexCount;
 
-        // World Transform
         glm::mat4 Transform;
-        glm::mat4 LocalTransform;
     };
 
     // TODO: support animated skeletons and MeshFactory
+    // TODO: 分离出Resource与Instance
+    // 参照UE
+    // MeshResource作为Resource, Submesh作为渲染atomic unit, Mesh与StaticMesh作为Instance
+    // 维护MaterialTable管理材质槽位, MaterialAsset作为资源存在
+    // 注意, 需要先完成Material的设计, 然后重构Shader关于Uniform部分的内容, 再回来设计Mesh
+
     class Mesh : public Asset
     {
     public:
@@ -51,6 +111,7 @@ namespace Mint {
         // not sure
         void OnUpdate(TimeStep ts);
         void OnImGuiRender();
+        void DumpVertexBuffer();
 
         Ref<Shader> GetShader() const { return m_mesh_shader; }
         Ref<Material> GetMaterial() const { return m_material; }
