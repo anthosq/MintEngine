@@ -21,3 +21,11 @@ current task: reconstruct renderer, 具体步骤见render_command里的注释
 next: 创建framebuffer内容, 修正viewport调整
 
 - 实现FrameBuffer前考虑对ImageFormat相关的抽象
+
+
+## 2026.1.3 开发计划:
+- 整理Shader class, 处理Shader Uniform部分
+- 处理Material, 初步实现Material Asset, Material RHI
+- 处理Mesh
+- 后续目标: 天空盒, ECS, 与光照
+- 序列化与反射
