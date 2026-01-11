@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include "render/render_system.h"
+#include "render/interface/opengl/opengl_utils.h"
 
 namespace Mint {
     OpenGLShader::OpenGLShader(const std::filesystem::path& filepath)
@@ -14,6 +15,7 @@ namespace Mint {
         ReadShaderFromFile(filepath);
         RenderSystem::Submit([this]() {
             CompileAndUploadShader();
+            Reflect();
         });
     }
 
@@ -136,6 +138,43 @@ namespace Mint {
         // UploadUniformInt("u_EnvIrradianceTex", 11);
 
         // UploadUniformInt("u_BRDFLUTTexture", 15);
+    }
+
+    void OpenGLShader::Reflect() {
+        if (m_renderer_id ==0) return;
+
+        m_uniforms.clear();
+
+        unsigned int numUniforms = 0;
+        glGetProgramiv(m_renderer_id, GL_ACTIVE_UNIFORMS, (GLint*)&numUniforms);
+
+        // unsured
+        unsigned int maxNameLength = 0;
+        glGetProgramiv(m_renderer_id, GL_ACTIVE_UNIFORM_MAX_LENGTH, (GLint*)&maxNameLength);
+        
+        std::vector<char> nameBuffer(maxNameLength);
+
+        uint32_t offset = 0;
+
+        LOG_INFO(fmt::format("Shader '{0}' Reflection:", m_name));
+        for (unsigned int i = 0; i < numUniforms; i++) {
+            GLsizei nameLength = 0;
+            GLint size = 0;
+            GLenum type = 0;
+
+            glGetActiveUniform(m_renderer_id, i, maxNameLength, &nameLength, &size, &type, nameBuffer.data());
+            std::string uniformName(nameBuffer.data(), nameLength);
+
+            ShaderUniformType uniformType = Utils::GLTypeToShaderUniformType(type);
+            uint32_t uniformSize = Utils::GetShaderUniformSize(uniformType);
+
+            m_uniforms[uniformName] = ShaderUniform(uniformName, uniformType, uniformSize, offset);
+
+            offset += uniformSize;
+
+            LOG_INFO(fmt::format("  Name: {0}, Type: {1}, Size: {2}, Offset: {3}", 
+                uniformName, ShaderUniform::UniformTypeToString(uniformType), uniformSize, offset));
+        }
     }
 
     OpenGLShader::~OpenGLShader() {

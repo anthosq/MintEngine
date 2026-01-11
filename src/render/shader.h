@@ -9,6 +9,47 @@
 #include "core/ref.h"
 
 namespace Mint {
+    enum class ShaderUniformType {
+        None = 0, Bool, Int, UInt, Float,
+        Vec2, Vec3, Vec4, Mat3, Mat4,
+        IVec2, IVec3, IVec4
+    };
+
+    class ShaderUniform {
+        public:
+            ShaderUniform() = default;
+            ShaderUniform(std::string name, ShaderUniformType type, uint32_t size, uint32_t offset);
+
+            const std::string& GetName() { return m_name; }
+            ShaderUniformType GetType() { return m_type; }
+            uint32_t GetSize() { return m_size; }
+            uint32_t GetOffset() { return m_offset; }
+
+            // 不确定这个是否该在这个类下
+            static std::string_view UniformTypeToString(ShaderUniformType type);
+
+            // TODO: 未来需要实现序列化与反序列划
+
+        private:
+            std::string m_name;
+            ShaderUniformType m_type = ShaderUniformType::None;
+            uint32_t m_size;
+            uint32_t m_offset;
+    };
+
+    // 用于描述Shader中的成组的unform变量, struct等, 如CameraData之类的
+    // CPU side buffer abstraction?
+    class ShaderBuffer {
+        public:
+        // TODO: 序列化与反序列化？
+
+            std::string m_name;
+            uint32_t m_size;
+            std::unordered_map<std::string, ShaderUniform> m_uniforms;
+    };
+
+
+
     class Shader : public RefCounter {
     public:
         // temporary factory method
@@ -32,7 +73,11 @@ namespace Mint {
         // like ShaderLibrary->Load(name, path);
         // using Ref to manage ShaderLibrary & Shader
         static Ref<Shader> Create(const std::filesystem::path& filepath);
+        
         virtual const std::string& GetName() const = 0;
+
+        virtual void Reflect() = 0;
+        virtual const std::unordered_map<std::string, ShaderUniform>& GetUniforms() const = 0;
     };
     
     // finnaly handled by ASSET system

@@ -5,6 +5,30 @@
 
 
 namespace Mint {
+    ShaderUniform::ShaderUniform(std::string name, ShaderUniformType type, uint32_t size, uint32_t offset)
+        : m_name(std::move(name)), m_type(type), m_size(size), m_offset(offset) {}
+
+
+    std::string_view ShaderUniform::UniformTypeToString(ShaderUniformType type) {
+        switch (type) {
+            case ShaderUniformType::None:    return "None";
+            case ShaderUniformType::Bool:    return "Bool";
+            case ShaderUniformType::Int:     return "Int";
+            case ShaderUniformType::UInt:    return "UInt";
+            case ShaderUniformType::Float:   return "Float";
+            case ShaderUniformType::Vec2:    return "Vec2";
+            case ShaderUniformType::Vec3:    return "Vec3";
+            case ShaderUniformType::Vec4:    return "Vec4";
+            case ShaderUniformType::Mat3:    return "Mat3";
+            case ShaderUniformType::Mat4:    return "Mat4";
+            case ShaderUniformType::IVec2:   return "IVec2";
+            case ShaderUniformType::IVec3:   return "IVec3";
+            case ShaderUniformType::IVec4:   return "IVec4";
+            default:                         return "Unknown";
+        }
+    }
+
+
     Ref<Shader> Shader::Create(const std::filesystem::path &filepath) {
         // Here we can add support for different rendering APIs in the future
         switch (RendererAPI::GetAPIType()) {

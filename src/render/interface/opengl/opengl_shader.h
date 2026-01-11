@@ -27,6 +27,10 @@ namespace Mint {
         void SetMat4(const std::string& name, const glm::mat4& matrix) override;
         const std::string& GetName() const override { return m_name; }
 
+        // 反射相关
+        void Reflect() override;
+        const std::unordered_map<std::string, ShaderUniform>& GetUniforms() const override { return m_uniforms; };
+
     private:
         void UploadUniformInt(const std::string& name, int value);
 
@@ -48,6 +52,8 @@ namespace Mint {
         std::filesystem::path m_asset_path;
         std::string m_shader_resource;
         uint32_t m_renderer_id;
+
+        std::unordered_map<std::string, ShaderUniform> m_uniforms;
     };
 
 }
