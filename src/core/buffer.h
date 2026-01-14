@@ -15,6 +15,13 @@ namespace Mint {
 
         Buffer(byte* data, uint32_t size) : Data(data), Size(size) {}
 
+        static Buffer Copy(const Buffer& other) {
+            Buffer buffer;
+            buffer.Allocate(other.Size);
+            memcpy(buffer.Data, other.Data, other.Size);
+            return buffer;
+        }
+
         static Buffer Copy(void* data, uint32_t size) {
             Buffer buffer;
             buffer.Allocate(size);
@@ -23,7 +30,7 @@ namespace Mint {
         }
 
         void Allocate(uint32_t size) {
-            delete[] Data;
+            delete[] (byte*)Data;
             Data = nullptr;
 
             if (size == 0)
@@ -31,6 +38,12 @@ namespace Mint {
 
             Data = new byte[size];
             Size = size;
+        }
+
+        void Release() {
+            delete[] (byte*)Data;
+            Data = nullptr;
+            Size = 0;
         }
 
         void ZeroInitialize() {
@@ -43,16 +56,30 @@ namespace Mint {
             memcpy(Data + offset, data, size);
         }
 
+        template <typename T>
+        T& Read(uint64_t offset = 0) {
+            return *(T*)(Data + offset);
+        }
+
+        template <typename T>
+        const T& Read(uint64_t offset = 0) const {
+            return *(T*)(Data + offset);
+        }
+
+        // read bytes
+
+
+        
         operator bool() const {
             return Data;
         }
 
         byte& operator[](int index) {
-            return Data[index];
+            return ((byte*)Data)[index];
         }
 
         byte operator[](int index) const {
-            return Data[index];
+            return ((byte*)Data)[index];
         }
 
         template<typename T>
