@@ -29,6 +29,17 @@
 
 ## 专题深度指南
 
+### [Phase 1 实现指南: UniformBuffer + Material](./implementation_guide_phase1.md)
+
+当前阶段的具体实现代码与设计思路：
+
+| 内容 | 说明 |
+|------|------|
+| UniformBuffer | std140 布局、延迟上传、脏标记机制 |
+| OpenGLMaterial | 基于 Shader 反射的参数管理 |
+| Asset 基类 | UUID 集成、类型系统、状态管理 |
+| 集成测试 | 完整的验证用例 |
+
 ### [RenderGraph 完全指南](./render_graph_guide.md)
 
 从传统渲染管线的痛点出发，深入理解 RenderGraph 的设计动机与实现：
@@ -167,4 +178,4 @@ RefCounter (引用计数基类)
 
 ---
 
-*更新日期: 2026-01-13*
+*更新日期: 2026-01-15*

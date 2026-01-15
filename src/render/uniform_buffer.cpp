@@ -5,14 +5,11 @@
 
 namespace Mint {
 
-    Ref<UniformBuffer> UniformBuffer::Create(uint32_t size, uint32_t binding) {
+    Ref<UniformBuffer> UniformBuffer::Create(uint32_t size) {
         switch (RenderSystem::GetAPI()) {
             case RendererAPI::RenderAPIType::OpenGL:
-                return Ref<OpenGLUniformBuffer>::Create(size, binding);
+                return Ref<OpenGLUniformBuffer>::Create(size);
             case RendererAPI::RenderAPIType::None:
-                return nullptr;
-            default:
-                // MINT_CORE_ASSERT(false, "RenderAPI::None is currently not supported!");
                 return nullptr;
         }
         return nullptr;
