@@ -32,7 +32,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${MINT_ROOT_DIR}/bin")
 # )
 
 add_subdirectory("${SOURCE_DIR}")
-
 add_executable(Mint ${MINT_SANDBOX_DIR}/sandbox.cpp)
 
 

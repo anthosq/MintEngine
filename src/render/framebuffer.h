@@ -7,7 +7,6 @@
 namespace Mint {
     using RendererID = uint32_t;
 
-    // 
     struct FramebufferSpecification {
         uint32_t Width = 1280;
         uint32_t Height = 720;
