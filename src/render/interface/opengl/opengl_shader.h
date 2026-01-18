@@ -3,6 +3,7 @@
 
 #include "render/interface/opengl/gl_common.h"
 #include "render/shader.h"
+#include "render/uniform_buffer.h"
 
 
 namespace Mint {
@@ -15,7 +16,10 @@ namespace Mint {
         void Unbind() const;
 
 
+        void SetUniformBuffer(const std::string& name, const Ref<UniformBuffer>& uniformBuffer) override;
+
         // wrapper functions for shader
+
         void SetInt(const std::string& name, int value) override;
 
         void SetFloat(const std::string& name, float value) override;

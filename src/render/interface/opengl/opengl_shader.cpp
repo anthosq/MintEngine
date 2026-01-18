@@ -7,6 +7,7 @@
 
 #include "render/render_system.h"
 #include "render/interface/opengl/opengl_utils.h"
+#include "render/interface/opengl/opengl_uniform_buffer.h"
 
 namespace Mint {
     OpenGLShader::OpenGLShader(const std::filesystem::path& filepath)
@@ -193,6 +194,10 @@ namespace Mint {
         RenderSystem::Submit([]() {
             glUseProgram(0);
         });
+    }
+
+    void OpenGLShader::SetUniformBuffer(const std::string& name, const Ref<UniformBuffer>& uniformBuffer) {
+
     }
 
     // wrapper functions

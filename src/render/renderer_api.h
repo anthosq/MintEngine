@@ -3,6 +3,16 @@
 #include "render/vertex_array.h"
 
 namespace Mint {
+    struct RenderAPICapabilities
+    {
+        std::string Vendor;
+        std::string Renderer;
+        std::string Version;
+
+        int MaxSamples;
+        float MaxAnisotropy;
+    };
+
     class RendererAPI {
         public:
             enum class RenderAPIType
@@ -22,6 +32,11 @@ namespace Mint {
             virtual void DrawIndexed(unsigned int count, bool depthTest = true) = 0;
 
             inline static RenderAPIType GetAPIType() { return s_api_type; }
+
+            inline static RenderAPICapabilities& GetCapabilities() { 
+                static RenderAPICapabilities s_capabilities;
+                return s_capabilities; 
+            }
         private:
             inline static RenderAPIType s_api_type = RendererAPI::RenderAPIType::OpenGL;
     };

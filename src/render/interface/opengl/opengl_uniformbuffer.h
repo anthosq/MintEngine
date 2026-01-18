@@ -10,7 +10,12 @@ namespace Mint {
         virtual void SetData(const void* data, uint32_t size, uint32_t offset) override;
         virtual void RenderThread_SetData(const void* data, uint32_t size, uint32_t offset) override;
 
+        // Get Method
+        uint32_t GetRenderID() const;
+        uint32_t GetSize() const;
+
     private:
         uint32_t m_RendererID;
+        uint32_t m_Size;
     };
 }

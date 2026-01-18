@@ -92,7 +92,6 @@ namespace Mint {
     }
 
     // OpenGLTextureCube implementation would go here
-    // !!!TODO: temporary implementation
     OpenGLTextureCube::OpenGLTextureCube(const TextureSpecification& spec, const std::filesystem::path& path)
         : m_specification(spec), m_path(path) {
         int width, height, channels;
@@ -112,7 +111,6 @@ namespace Mint {
         unsigned int faceWidth = width / 4;
         unsigned int faceHeight = height / 3;
 
-
         if (faceWidth != faceHeight) {
             LOG_ERROR(fmt::format("Cube texture faces are not square in image: {0}", path.string()));
             stbi_image_free(data);
@@ -126,45 +124,76 @@ namespace Mint {
 
         int faceIndex = 0;
 
-        // NOTE: confused, 之后弄清楚后重构
-        for (size_t i = 0; i < 3; i++) {
-            for (size_t j = 0; j < 4; j++) {
-                if ((i == 1 && j == 1) || // +Y
-                    (i == 0 && j == 1) || // -Y
-                    (i == 1 && j == 0) || // -X
-                    (i == 1 && j == 2) || // +X
-                    (i == 2 && j == 1) || // +Z
-                    (i == 1 && j == 3))   // -Z
-                {
-                    for (unsigned int y = 0; y < faceHeight; y++) {
-                        memcpy(faces[faceIndex] + y * faceWidth * 3,
-                               data + ((i * faceHeight + y) * width + (j * faceWidth)) * 3,
-                               faceWidth * 3);
-                    }
-                    faceIndex++;
+        for (size_t i = 0; i < 4; i++) {
+            for (size_t y = 0; y < faceHeight; y++) {
+                size_t yOffset = y + faceHeight;
+                for (size_t x = 0; x < faceWidth; x++) {
+                    size_t xOffset = x + i * faceWidth;
+                    faces[faceIndex][(x + y * faceWidth) * 3 + 0] = data[(xOffset + yOffset * width) * 3 + 0];
+                    faces[faceIndex][(x + y * faceWidth) * 3 + 1] = data[(xOffset + yOffset * width) * 3 + 1];
+                    faces[faceIndex][(x + y * faceWidth) * 3 + 2] = data[(xOffset + yOffset * width) * 3 + 2];
                 }
             }
+            faceIndex++;
         }
 
-        glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_rendererID);
-        glTextureStorage2D(m_rendererID, 1, GL_RGB8, faceWidth, faceHeight);
-        for (unsigned int i = 0; i < 6; i++) {
-            glTextureSubImage3D(m_rendererID, 0, 0, 0, i, faceWidth, faceHeight, 1,
-                                GL_RGB, GL_UNSIGNED_BYTE, faces[i]);
+        for (size_t i = 0; i < 3; i++) {
+            if (i == 1) continue;
+            for (size_t y = 0; y < faceHeight; y++) {
+                size_t yOffset = y + i * faceHeight;
+                for (size_t x = 0; x < faceWidth; x++) {
+                    size_t xOffset = x + faceWidth;
+                    faces[faceIndex][(x + y * faceWidth) * 3 + 0] = data[(xOffset + yOffset * width) * 3 + 0];
+                    faces[faceIndex][(x + y * faceWidth) * 3 + 1] = data[(xOffset + yOffset * width) * 3 + 1];
+                    faces[faceIndex][(x + y * faceWidth) * 3 + 2] = data[(xOffset + yOffset * width) * 3 + 2];
+                }
+            }
+            faceIndex++;
+        }
+
+        RenderSystem::Submit([=]() {
+        glGenTextures(1, &m_rendererID);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, m_rendererID);
+
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameterf(m_rendererID, GL_TEXTURE_MAX_ANISOTROPY, RendererAPI::GetCapabilities().MaxAnisotropy);
+
+        GLenum GLformat = Utils::ToGLTextureFormat(m_specification.Format);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GLformat, faceWidth, faceHeight, 0, GLformat, GL_UNSIGNED_BYTE, faces[2]);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GLformat, faceWidth, faceHeight, 0, GLformat, GL_UNSIGNED_BYTE, faces[0]);
+
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GLformat, faceWidth, faceHeight, 0, GLformat, GL_UNSIGNED_BYTE, faces[4]);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GLformat, faceWidth, faceHeight, 0, GLformat, GL_UNSIGNED_BYTE, faces[5]);
+
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GLformat, faceWidth, faceHeight, 0, GLformat, GL_UNSIGNED_BYTE, faces[1]);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GLformat, faceWidth, faceHeight, 0, GLformat, GL_UNSIGNED_BYTE, faces[3]);
+
+        glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        for (size_t i = 0; i < faces.size(); i++) {
             delete[] faces[i];
         }
-        glTextureParameteri(m_rendererID, GL_TEXTURE_MIN_FILTER, Utils::ToGLTextureFilter(m_specification.MinFilter));
-        glTextureParameteri(m_rendererID, GL_TEXTURE_MAG_FILTER, Utils::ToGLTextureFilter(m_specification.MagFilter));
+
         stbi_image_free(data);
+        });
     }
 
     OpenGLTextureCube::~OpenGLTextureCube() {
-        glDeleteTextures(1, &m_rendererID);
+        auto self = this;
+        RenderSystem::Submit([self]() {
+            glDeleteTextures(1, &self->m_rendererID);
+        });
     }
 
     void OpenGLTextureCube::Bind(uint32_t slot) const {
-        glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTextureUnit(slot, m_rendererID);
+        RenderSystem::Submit([this, slot]() {
+            glBindTextureUnit(slot, m_rendererID);
+        });
     }
 
 }
