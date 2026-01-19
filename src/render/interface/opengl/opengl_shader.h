@@ -16,7 +16,7 @@ namespace Mint {
         void Unbind() const;
 
 
-        void SetUniformBuffer(const std::string& name, const Ref<UniformBuffer>& uniformBuffer) override;
+        void SetUniformBuffer(const std::string& name, const Ref<ShaderBuffer>& uniformBuffer) override;
 
         // wrapper functions for shader
 

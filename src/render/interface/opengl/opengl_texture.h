@@ -40,7 +40,7 @@ namespace Mint{
 
     class OpenGLTextureCube : public TextureCube {
     public:
-        OpenGLTextureCube(const TextureSpecification& spec, const std::filesystem::path& path);
+        OpenGLTextureCube(const std::filesystem::path& path);
         virtual ~OpenGLTextureCube();
 
         void Bind(uint32_t slot) const override;

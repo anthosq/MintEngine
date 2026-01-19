@@ -58,6 +58,8 @@ namespace Mint {
         virtual void Bind() const = 0;
         virtual void Unbind() const = 0;
 
+        virtual void SetUniformBuffer(const std::string& name, const Ref<ShaderBuffer>& buffer) = 0;
+
         // wrapper functions
         virtual void SetInt(const std::string& name, int value) = 0;
 

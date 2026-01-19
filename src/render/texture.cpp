@@ -27,11 +27,11 @@ namespace Mint {
         return nullptr;
     }
 
-    Ref<TextureCube> TextureCube::Create(const TextureSpecification& spec, const std::filesystem::path& path) {
+    Ref<TextureCube> TextureCube::Create(const std::filesystem::path& path) {
         switch (RendererAPI::GetAPIType()) {
             case RendererAPI::RenderAPIType::None:            return nullptr;
             case RendererAPI::RenderAPIType::OpenGL:          // TODO: 实现OpenGLTextureCube类
-                                                    return Ref<OpenGLTextureCube>::Create(spec, path);
+                                                    return Ref<OpenGLTextureCube>::Create(path);
         }
 
         // MINT_CORE_ASSERT(false, "Unknown RendererAPI!");

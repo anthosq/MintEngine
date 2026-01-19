@@ -7,10 +7,10 @@ namespace Mint {
 
     // should it be inherited from ref?
     // it should use factory model
-    class UniformBufferSet : public Refcounter{
+    class UniformBufferSet : public RefCounter {
     public:
         // Set & Get Method?
 
         static Ref<UniformBufferSet> Create();
-    }
+    };
 }

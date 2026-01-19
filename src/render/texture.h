@@ -98,7 +98,7 @@ namespace Mint {
     class TextureCube : public Texture {
     public:
         // temporary
-        static Ref<TextureCube> Create(const TextureSpecification& spec, const std::filesystem::path& path);
+        static Ref<TextureCube> Create(const std::filesystem::path& path);
 
         virtual TextureType GetType() const override { return TextureType::TextureCube; }
 

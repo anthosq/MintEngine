@@ -92,8 +92,8 @@ namespace Mint {
     }
 
     // OpenGLTextureCube implementation would go here
-    OpenGLTextureCube::OpenGLTextureCube(const TextureSpecification& spec, const std::filesystem::path& path)
-        : m_specification(spec), m_path(path) {
+    OpenGLTextureCube::OpenGLTextureCube(const std::filesystem::path& path)
+        : m_path(path) {
         int width, height, channels;
         stbi_set_flip_vertically_on_load(0);
         // TODO: using own image data class, like buffer<uint8_t>

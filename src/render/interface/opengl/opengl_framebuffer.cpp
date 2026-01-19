@@ -3,13 +3,33 @@
 
 namespace Mint {
     OpenGLFramebuffer::OpenGLFramebuffer(const FramebufferSpecification& spec)
-        : m_Specification(spec)
-    {
+        : m_Specification(spec) {
     }
+
 
     OpenGLFramebuffer::~OpenGLFramebuffer() {
         Release();
     }
+
+    void OpenGLFramebuffer::Bind() const {
+        RenderSystem::Submit([this]() {
+            glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+        });
+    }
+
+    void OpenGLFramebuffer::Unbind() const {
+        RenderSystem::Submit([this]() {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        });
+    }
+
+    void OpenGLFramebuffer::BindTexture(uint32_t attachmentIndex, uint32_t slot) const {
+        RenderSystem::Submit([this, attachmentIndex, slot]() {
+            glBindTextureUnit(slot, m_ColorAttachments[attachmentIndex]);
+        });
+    }
+
+    
 
     void OpenGLFramebuffer::Release() {
         // Release the framebuffer resources
