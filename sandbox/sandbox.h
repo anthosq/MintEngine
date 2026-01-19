@@ -16,7 +16,8 @@ public:
     void SetupFramebuffers() {}
 
     // 渲染Utils
-    void RenderScene();
+    // void RenderScene();
+    void OnRender(Mint::TimeStep delta_time);
     void RenderCubes();
     void RenderSkybox();
 
@@ -30,7 +31,6 @@ private:
     // Cube
     Mint::Ref<Mint::Shader> m_cube_shader;
     Mint::Ref<Mint::VertexArray> m_cube_vao;
-    Mint::Ref<Mint::VertexBuffer> m_cube_vbo;
     Mint::Ref<Mint::Texture2D> m_cube_texture;
 
     // test

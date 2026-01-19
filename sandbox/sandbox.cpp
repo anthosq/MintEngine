@@ -1,69 +1,65 @@
 #include "sandbox.h"
 
+// temporary data for test
+static float vertices[4 * 5] = {
+    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+    -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+    0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
+    0.5f, -0.5f, 0.0f, 1.0f, 0.0f};
+
+    // ...existing code...
+
+static float cube_vertices[] = {
+    // Back face (Normal 0, 0, -1)
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f, // 0: Bottom-Left
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f, // 1: Top-Right
+     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f, // 2: Bottom-Right
+    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f, // 3: Top-Left
+    // Front face (Normal 0, 0, 1)
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f, // 4: Bottom-Left
+     0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f, // 5: Bottom-Right
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f, // 6: Top-Right
+    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f, // 7: Top-Left
+    // Left face (Normal -1, 0, 0)
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f, // 8: Top-Right
+    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f, // 9: Top-Left
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f, // 10: Bottom-Left
+    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f, // 11: Bottom-Right
+    // Right face (Normal 1, 0, 0)
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, // 12: Top-Left
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f, // 13: Bottom-Right
+     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, // 14: Top-Right
+     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f, // 15: Bottom-Left
+    // Bottom face (Normal 0, -1, 0)
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f, // 16: Top-Left
+     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f, // 17: Top-Right
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f, // 18: Bottom-Right
+    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f, // 19: Bottom-Left
+    // Top face (Normal 0, 1, 0)
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f, // 20: Top-Left
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f, // 21: Bottom-Right
+     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f, // 22: Top-Right
+    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f  // 23: Bottom-Left
+};
+
+static unsigned int cube_indices[] = {
+    0, 1, 2, 1, 0, 3,       // Back
+    4, 5, 6, 6, 7, 4,       // Front
+    8, 9, 10, 10, 11, 8,    // Left
+    12, 13, 14, 13, 12, 15, // Right
+    16, 17, 18, 18, 19, 16, // Bottom
+    20, 21, 22, 21, 20, 23  // Top
+};
+
 ExampleLayer::ExampleLayer() : Layer("Example"), m_camera(60, 1600.0f / 900.0f, 0.1f, 100.0f), // 16:9 纵横比
                                rectangle_transform({0.0f, 0.0f, 0.0f}) {
     // Mint::LOG_INFO("ExampleLayer::OnAttach");
 
-    // -------------临时------------------
     // Prepare something for render
-    // Vertex Array
-    // Index Buffer
+    SetupShaders();
+    SetupBuffers();
+    SetupTextures();
 
-    m_vertex_array = Mint::VertexArray::Create();
-
-    // adding texture coordinates
-    float vertices[4 * 5] = {
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-        0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
-        0.5f, -0.5f, 0.0f, 1.0f, 0.0f};
-
-    // vertex buffer
-    Mint::Ref<Mint::VertexBuffer> m_vertex_buffer;
-    Mint::Ref<Mint::IndexBuffer> m_index_buffer;
-    m_vertex_buffer = Mint::VertexBuffer::Create(vertices, sizeof(vertices));
-
-    Mint::BufferLayout layout = {
-        {Mint::ShaderDataType::Float3, "a_position"},
-        {Mint::ShaderDataType::Float2, "a_texCoord"}};
-    m_vertex_buffer->SetLayout(layout);
-
-    m_vertex_array->AddVertexBuffer(m_vertex_buffer);
-
-    // index buffer
-    unsigned int indices[6] = {0, 1, 2, 0, 3, 2};
-    m_index_buffer = Mint::IndexBuffer::Create(indices, 6 * sizeof(unsigned int));
-    m_vertex_array->SetIndexBuffer(m_index_buffer);
-
-    // shader wrap seems completed
-    m_shader = Mint::Shader::Create("sandbox/assets/shaders/test_shader.glsl");
-
-    m_shader_library.Load("sandbox/assets/shaders/test_texture.glsl");
-
-    Mint::TextureSpecification spec;
-    m_texture = Mint::Texture2D::Create({.MagFilter = Mint::TextureFilter::Nearest}, "sandbox/assets/pics/Checkerboard.png");
-    m_transparent_texture = Mint::Texture2D::Create({.MagFilter = Mint::TextureFilter::Nearest}, "sandbox/assets/pics/ChernoLogo.png");
-
-    // skybox
-    m_skybox_texture = Mint::TextureCube::Create("sandbox/assets/pics/Arches_E_PineTree_Radiance.tga");
-    m_skybox_irradiance_texture = Mint::TextureCube::Create("sandbox/assets/pics/Arches_E_PineTree_Irradiance.tga");
-
-    // // test for skybox
-    // Mint::TextureSpecification cubeSpec;
-    // cubeSpec.MinFilter = Mint::TextureFilter::Linear;
-    // cubeSpec.MagFilter = Mint::TextureFilter::Linear;
-    // cubeSpec.WrapS = Mint::TextureWrap::ClampToEdge;
-    // cubeSpec.WrapT = Mint::TextureWrap::ClampToEdge;
-
-    // m_skybox_texture = Mint::TextureCube::Create(cubeSpec, "sandbox/assets/pics/Arches_E_PineTree_Radiance.tga");
-    // m_shader_library.Load("sandbox/assets/shaders/test_skybox.glsl");
-    // Mint::Ref<Mint::VertexBuffer> skyboxVB = Mint::VertexBuffer::Create(skyboxVertices, sizeof(skyboxVertices));
-    // Mint::BufferLayout skyboxLayout = {
-    //     {Mint::ShaderDataType::Float3, "a_Position"}
-    // };
-    // skyboxVB->SetLayout(skyboxLayout);
-    // m_skybox_vertex_array = Mint::VertexArray::Create();
-    // m_skybox_vertex_array->AddVertexBuffer(skyboxVB);
 }
 
 void ExampleLayer::OnUpdate(Mint::TimeStep delta_time) {
@@ -71,53 +67,8 @@ void ExampleLayer::OnUpdate(Mint::TimeStep delta_time) {
     // 后续处理动作逻辑可以采用这种轮询的方式？
     // if (Mint::Input::IsKeyPressed(Mint::Key::A)) {
     //     Mint::LOG_INFO("Key A is pressed (polling)");
+    OnRender(delta_time);
 
-    // Mint::LOG_INFO(fmt::format("Delta Time: {0}", delta_time.GetSeconds()));
-    // camera movement
-
-    Mint::g_runtime_global_context.m_render_system->Clear({0.1f, 0.1f, 0.1f, 1});
-
-    m_camera.OnUpdate(delta_time);
-    // m_camera.SetPosition({0.0f, 0.0f, 0.0f});
-
-    // m_camera.SetPosition(camera_position);
-    // m_camera.SetRotation_deg(camera_rotation);
-
-    Mint::g_runtime_global_context.m_render_system->BeginScene(m_camera);
-
-    // temporary transform function
-    glm::mat4 transform = glm::translate(glm::mat4(1.0f), rectangle_transform);
-    glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5f, 1.5f, 1.5f));
-    transform = transform * scale;
-
-    // for (int i = 0; i < 10; i++) {
-    //     float offset = i * 1.1f;
-    //     glm::mat4 square_transform = glm::translate(transform, glm::vec3(offset, 0.0f, 0.0f));
-    //     m_shader->Bind();
-    //     m_shader->SetFloat4("u_Color", glm::vec4(rectangle_color, 1.0f));
-    //     Mint::RenderSystem::Submit(m_shader, m_vertex_array, square_transform);
-    // }
-
-    m_texture->Bind();
-    auto m_texture_shader = m_shader_library.Get("test_texture");
-    m_texture_shader->SetInt("u_Texture", 0); // Texture unit 0
-    Mint::g_runtime_global_context.m_render_system->Submit(m_texture_shader, m_vertex_array, transform);
-
-    m_transparent_texture->Bind();
-    m_texture_shader->SetInt("u_Texture", 0); // Texture unit 0
-    Mint::g_runtime_global_context.m_render_system->Submit(m_texture_shader, m_vertex_array, transform);
-
-    // // render skybox
-    // auto m_skybox_shader = m_shader_library.Get("test_skybox");;
-    // m_skybox_shader->Bind();
-    // m_skybox_texture->Bind(0);
-    // m_skybox_shader->SetInt("u_Skybox", 0); // Texture unit 0
-    // m_skybox_shader->SetMat4("u_View", glm::mat4(glm::mat3(m_camera.GetViewMatrix()))); // remove translation from the view matrix
-    // m_skybox_shader->SetMat4("u_Projection", m_camera.GetProjectionMatrix());
-
-    // Mint::RenderSystem::Submit(m_skybox_shader, m_skybox_vertex_array, glm::mat4(1.0f));
-
-    Mint::g_runtime_global_context.m_render_system->EndScene();
 }
 
 void ExampleLayer::OnEvent(Mint::Event& e) {
@@ -154,9 +105,42 @@ void ExampleLayer::OnImGuiRender() {
 }
 
 // Setup Utils
-void ExampleLayer::SetupShaders() {}
+void ExampleLayer::SetupShaders() {
+    m_shader = Mint::Shader::Create("sandbox/assets/shaders/test_shader.glsl");
+    m_shader_library.Load("sandbox/assets/shaders/test_texture.glsl");
+}
+
 void ExampleLayer::SetupBuffers() {
-    // Cube VAO
+
+    // cube
+    m_cube_vao = Mint::VertexArray::Create();
+    Mint::Ref<Mint::VertexBuffer> cube_vbo;
+    Mint::Ref<Mint::IndexBuffer> cube_ibo;
+    cube_vbo = Mint::VertexBuffer::Create(cube_vertices, sizeof(cube_vertices));
+    Mint::BufferLayout cube_layout = {};
+    cube_vbo->SetLayout(cube_layout);
+    m_cube_vao->AddVertexBuffer(cube_vbo);
+    cube_ibo = Mint::IndexBuffer::Create(cube_indices, sizeof(cube_indices));
+    m_cube_vao->SetIndexBuffer(cube_ibo);
+
+
+    // Test vao&vbo&ibo
+    m_vertex_array = Mint::VertexArray::Create();
+
+    Mint::Ref<Mint::VertexBuffer> m_vertex_buffer;
+    Mint::Ref<Mint::IndexBuffer> m_index_buffer;
+    m_vertex_buffer = Mint::VertexBuffer::Create(vertices, sizeof(vertices));
+
+    Mint::BufferLayout layout = {
+        {Mint::ShaderDataType::Float3, "a_position"},
+        {Mint::ShaderDataType::Float2, "a_texCoord"}};
+    m_vertex_buffer->SetLayout(layout);
+
+    // index buffer
+    unsigned int indices[6] = {0, 1, 2, 0, 3, 2};
+    m_index_buffer = Mint::IndexBuffer::Create(indices, 6 * sizeof(unsigned int));
+    m_vertex_array->AddVertexBuffer(m_vertex_buffer);
+    m_vertex_array->SetIndexBuffer(m_index_buffer);
 
     // ScreenQuad VAO
 
@@ -164,13 +148,51 @@ void ExampleLayer::SetupBuffers() {
 
 void ExampleLayer::SetupTextures() {
 
+    m_texture = Mint::Texture2D::Create({.MagFilter = Mint::TextureFilter::Nearest}, "sandbox/assets/pics/Checkerboard.png");
+    m_transparent_texture = Mint::Texture2D::Create({.MagFilter = Mint::TextureFilter::Nearest}, "sandbox/assets/pics/ChernoLogo.png");
+    m_skybox_texture = Mint::TextureCube::Create("sandbox/assets/pics/Arches_E_PineTree_Radiance.tga");
+    m_skybox_irradiance_texture = Mint::TextureCube::Create("sandbox/assets/pics/Arches_E_PineTree_Irradiance.tga");
+
 }
 // void SetupFramebuffers()
 
 // Render Utils
-void ExampleLayer::RenderScene() {
+// void ExampleLayer::RenderScene() {
 
+// }
+void ExampleLayer::OnRender(Mint::TimeStep delta_time) {
+    // Not sure whether this should be here
+    Mint::g_runtime_global_context.m_render_system->Clear({0.1f, 0.1f, 0.1f, 1});
+
+    // Need to complete scene, adding ECS here
+    m_camera.OnUpdate(delta_time);
+    Mint::g_runtime_global_context.m_render_system->BeginScene(m_camera);
+
+    RenderCubes();
+
+    RenderSkybox();
+
+
+    // TODO: Move to OnRender function
+    // temporary transform function
+    // for each object, compute transform matrix
+
+    glm::mat4 transform = glm::translate(glm::mat4(1.0f), rectangle_transform);
+    glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5f, 1.5f, 1.5f));
+    transform = transform * scale;
+
+    m_texture->Bind();
+    auto m_texture_shader = m_shader_library.Get("test_texture");
+    m_texture_shader->SetInt("u_Texture", 0); // Texture unit 0
+    Mint::g_runtime_global_context.m_render_system->Submit(m_texture_shader, m_vertex_array, transform);
+
+    m_transparent_texture->Bind();
+    m_texture_shader->SetInt("u_Texture", 0); // Texture unit 0
+    Mint::g_runtime_global_context.m_render_system->Submit(m_texture_shader, m_vertex_array, transform);
+
+    Mint::g_runtime_global_context.m_render_system->EndScene();
 }
+
 
 void ExampleLayer::RenderCubes() {
 
