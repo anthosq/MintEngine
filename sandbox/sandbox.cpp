@@ -10,46 +10,50 @@ static float vertices[4 * 5] = {
     // ...existing code...
 
 static float cube_vertices[] = {
-    // Back face (Normal 0, 0, -1)
-    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f, // 0: Bottom-Left
-     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f, // 1: Top-Right
-     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f, // 2: Bottom-Right
-    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f, // 3: Top-Left
-    // Front face (Normal 0, 0, 1)
-    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f, // 4: Bottom-Left
-     0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f, // 5: Bottom-Right
-     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f, // 6: Top-Right
-    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f, // 7: Top-Left
-    // Left face (Normal -1, 0, 0)
-    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f, // 8: Top-Right
-    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f, // 9: Top-Left
-    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f, // 10: Bottom-Left
-    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f, // 11: Bottom-Right
-    // Right face (Normal 1, 0, 0)
-     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, // 12: Top-Left
-     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f, // 13: Bottom-Right
-     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, // 14: Top-Right
-     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f, // 15: Bottom-Left
-    // Bottom face (Normal 0, -1, 0)
-    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f, // 16: Top-Left
-     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f, // 17: Top-Right
-     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f, // 18: Bottom-Right
-    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f, // 19: Bottom-Left
-    // Top face (Normal 0, 1, 0)
-    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f, // 20: Top-Left
-     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f, // 21: Bottom-Right
-     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f, // 22: Top-Right
-    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f  // 23: Bottom-Left
+    // positions          // normals           // texture coords
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
+
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f
 };
 
-static unsigned int cube_indices[] = {
-    0, 1, 2, 1, 0, 3,       // Back
-    4, 5, 6, 6, 7, 4,       // Front
-    8, 9, 10, 10, 11, 8,    // Left
-    12, 13, 14, 13, 12, 15, // Right
-    16, 17, 18, 18, 19, 16, // Bottom
-    20, 21, 22, 21, 20, 23  // Top
-};
 
 ExampleLayer::ExampleLayer() : Layer("Example"), m_camera(60, 1600.0f / 900.0f, 0.1f, 100.0f), // 16:9 纵横比
                                rectangle_transform({0.0f, 0.0f, 0.0f}) {
@@ -108,20 +112,24 @@ void ExampleLayer::OnImGuiRender() {
 void ExampleLayer::SetupShaders() {
     m_shader = Mint::Shader::Create("sandbox/assets/shaders/test_shader.glsl");
     m_shader_library.Load("sandbox/assets/shaders/test_texture.glsl");
+    m_shader_library.Load("sandbox/assets/shaders/cube_shader.glsl");
 }
 
 void ExampleLayer::SetupBuffers() {
 
-    // cube
+    // Cube
     m_cube_vao = Mint::VertexArray::Create();
     Mint::Ref<Mint::VertexBuffer> cube_vbo;
-    Mint::Ref<Mint::IndexBuffer> cube_ibo;
+    // Mint::Ref<Mint::IndexBuffer> cube_ibo;
     cube_vbo = Mint::VertexBuffer::Create(cube_vertices, sizeof(cube_vertices));
-    Mint::BufferLayout cube_layout = {};
+    Mint::BufferLayout cube_layout = {
+        {Mint::ShaderDataType::Float3, "a_Position"},
+        {Mint::ShaderDataType::Float3, "a_Normal"},
+        {Mint::ShaderDataType::Float2, "a_TexCoord"}};
     cube_vbo->SetLayout(cube_layout);
     m_cube_vao->AddVertexBuffer(cube_vbo);
-    cube_ibo = Mint::IndexBuffer::Create(cube_indices, sizeof(cube_indices));
-    m_cube_vao->SetIndexBuffer(cube_ibo);
+    // cube_ibo = Mint::IndexBuffer::Create(cube_indices, sizeof(cube_indices));
+    // m_cube_vao->SetIndexBuffer(cube_ibo);
 
 
     // Test vao&vbo&ibo
@@ -135,11 +143,10 @@ void ExampleLayer::SetupBuffers() {
         {Mint::ShaderDataType::Float3, "a_position"},
         {Mint::ShaderDataType::Float2, "a_texCoord"}};
     m_vertex_buffer->SetLayout(layout);
-
-    // index buffer
-    unsigned int indices[6] = {0, 1, 2, 0, 3, 2};
-    m_index_buffer = Mint::IndexBuffer::Create(indices, 6 * sizeof(unsigned int));
     m_vertex_array->AddVertexBuffer(m_vertex_buffer);
+
+    unsigned int indices[6] = {0, 1, 2, 0, 3, 2};
+    m_index_buffer = Mint::IndexBuffer::Create(indices, sizeof(indices));
     m_vertex_array->SetIndexBuffer(m_index_buffer);
 
     // ScreenQuad VAO
@@ -150,8 +157,9 @@ void ExampleLayer::SetupTextures() {
 
     m_texture = Mint::Texture2D::Create({.MagFilter = Mint::TextureFilter::Nearest}, "sandbox/assets/pics/Checkerboard.png");
     m_transparent_texture = Mint::Texture2D::Create({.MagFilter = Mint::TextureFilter::Nearest}, "sandbox/assets/pics/ChernoLogo.png");
-    m_skybox_texture = Mint::TextureCube::Create("sandbox/assets/pics/Arches_E_PineTree_Radiance.tga");
-    m_skybox_irradiance_texture = Mint::TextureCube::Create("sandbox/assets/pics/Arches_E_PineTree_Irradiance.tga");
+    m_cube_texture = Mint::Texture2D::Create({.MagFilter = Mint::TextureFilter::Nearest}, "sandbox/assets/pics/Container2.png");
+    // m_skybox_texture = Mint::TextureCube::Create("sandbox/assets/pics/Arches_E_PineTree_Radiance.tga");
+    // m_skybox_irradiance_texture = Mint::TextureCube::Create("sandbox/assets/pics/Arches_E_PineTree_Irradiance.tga");
 
 }
 // void SetupFramebuffers()
@@ -171,7 +179,6 @@ void ExampleLayer::OnRender(Mint::TimeStep delta_time) {
     RenderCubes();
 
     RenderSkybox();
-
 
     // TODO: Move to OnRender function
     // temporary transform function
@@ -196,6 +203,14 @@ void ExampleLayer::OnRender(Mint::TimeStep delta_time) {
 
 void ExampleLayer::RenderCubes() {
 
+    glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 0.0f, 0.0f));
+    glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    transform = transform * scale;
+
+    m_cube_texture->Bind();
+    auto m_cube_shader = m_shader_library.Get("cube_shader");
+    m_cube_shader->SetInt("u_Texture", 0); // Texture unit 1
+    Mint::g_runtime_global_context.m_render_system->SubmitArrays(m_cube_shader, m_cube_vao, GL_TRIANGLES, 36, 0, transform);
 }
 void ExampleLayer::RenderSkybox() {
 

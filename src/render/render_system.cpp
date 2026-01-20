@@ -49,6 +49,12 @@ namespace Mint {
         });
     }
 
+    void RenderSystem::DrawArrays(uint32_t mode, uint32_t count, uint32_t first, bool depth_test) {
+        RenderSystem::Submit([=]() {
+            m_rendererAPI->DrawArrays(mode, first, count, depth_test);
+        });
+    }
+
     // Maybe this should be called Flush?
     void RenderSystem::WaitAndRender() {
         m_renderer->m_commandQueue.Execute();
@@ -94,4 +100,14 @@ namespace Mint {
         DrawIndexed(vertex_array->GetIndexBuffer()->GetCount());
     }
 
+    // temp?
+    void RenderSystem::SubmitArrays(Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, uint32_t mode, uint32_t count, uint32_t first, const glm::mat4& transform) {
+        glm::mat4 viewProj = m_sceneData->viewProjectionMatrix;
+        shader->Bind();
+        shader->SetMat4("u_ViewProjection", viewProj);
+        // Model matrix
+        shader->SetMat4("u_Transform", transform);
+        vertex_array->Bind();
+        DrawArrays(mode, count, first);
+    }
 }

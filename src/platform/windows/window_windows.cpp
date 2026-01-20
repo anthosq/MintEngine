@@ -78,7 +78,6 @@ namespace Mint {
 
         LOG_INFO(fmt::format("Creating window {0} ({1}, {2})", m_data.title, m_data.width, m_data.height));
 
-
         m_window = glfwCreateWindow(m_data.width, m_data.height, m_data.title.c_str(), nullptr, nullptr);
         
 

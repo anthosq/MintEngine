@@ -29,7 +29,9 @@ namespace Mint {
             virtual void Clear(const glm::vec4& color) = 0;
 
             // !TODO: change to accept count and depth test flag
-            virtual void DrawIndexed(unsigned int count, bool depthTest = true) = 0;
+            virtual void DrawIndexed(uint32_t count, bool depthTest = true) = 0;
+
+            virtual void DrawArrays(uint32_t mode, uint32_t first, uint32_t count, bool depthTest = true) = 0;
 
             inline static RenderAPIType GetAPIType() { return s_api_type; }
 
