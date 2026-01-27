@@ -51,9 +51,9 @@ namespace Mint {
         void OnWindowResize(uint32_t width, uint32_t height);
 
         // temporary adding Transform
-        void Submit(Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transform = glm::mat4(1.0f));
+        void Submit(Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transform = glm::mat4(1.0f), bool depth_test = true);
 
-        void SubmitArrays(Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, uint32_t mode, uint32_t count = 0, uint32_t first = 0, const glm::mat4& transform = glm::mat4(1.0f));
+        void SubmitArrays(Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, uint32_t mode, uint32_t count = 0, uint32_t first = 0, const glm::mat4& transform = glm::mat4(1.0f), bool depth_test = true);
 
         static RendererAPI::RenderAPIType GetAPI() { return RendererAPI::GetAPIType(); }
 

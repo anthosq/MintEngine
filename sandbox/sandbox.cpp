@@ -1,4 +1,5 @@
 #include "sandbox.h"
+#include <map>
 
 // temporary data for test
 static float vertices[4 * 5] = {
@@ -105,12 +106,14 @@ void ExampleLayer::OnImGuiRender() {
                 m_camera.GetFocalPoint().x,
                 m_camera.GetFocalPoint().y,
                 m_camera.GetFocalPoint().z);
+    uint32_t tex_id = m_framebuffer->GetColorAttachmentRendererID();
+    ImGui::Image((void*)tex_id, ImVec2(1280, 720), ImVec2(0, 1), ImVec2(1, 0));
     ImGui::End();
 }
 
 // Setup Utils
 void ExampleLayer::SetupShaders() {
-    m_shader = Mint::Shader::Create("sandbox/assets/shaders/test_shader.glsl");
+    m_plane_shader = Mint::Shader::Create("sandbox/assets/shaders/test_shader.glsl");
     m_shader_library.Load("sandbox/assets/shaders/test_texture.glsl");
     m_shader_library.Load("sandbox/assets/shaders/cube_shader.glsl");
 }
@@ -132,30 +135,34 @@ void ExampleLayer::SetupBuffers() {
     // m_cube_vao->SetIndexBuffer(cube_ibo);
 
 
-    // Test vao&vbo&ibo
-    m_vertex_array = Mint::VertexArray::Create();
+    // Test plane
+    m_plane_vao = Mint::VertexArray::Create();
 
-    Mint::Ref<Mint::VertexBuffer> m_vertex_buffer;
-    Mint::Ref<Mint::IndexBuffer> m_index_buffer;
-    m_vertex_buffer = Mint::VertexBuffer::Create(vertices, sizeof(vertices));
+    Mint::Ref<Mint::VertexBuffer> m_plane_vbo;
+    Mint::Ref<Mint::IndexBuffer> m_plane_ibo;
+    m_plane_vbo = Mint::VertexBuffer::Create(vertices, sizeof(vertices));
 
     Mint::BufferLayout layout = {
         {Mint::ShaderDataType::Float3, "a_position"},
         {Mint::ShaderDataType::Float2, "a_texCoord"}};
-    m_vertex_buffer->SetLayout(layout);
-    m_vertex_array->AddVertexBuffer(m_vertex_buffer);
+    m_plane_vbo->SetLayout(layout);
+    m_plane_vao->AddVertexBuffer(m_plane_vbo);
 
     unsigned int indices[6] = {0, 1, 2, 0, 3, 2};
-    m_index_buffer = Mint::IndexBuffer::Create(indices, sizeof(indices));
-    m_vertex_array->SetIndexBuffer(m_index_buffer);
+    m_plane_ibo = Mint::IndexBuffer::Create(indices, sizeof(indices));
+    m_plane_vao->SetIndexBuffer(m_plane_ibo);
 
     // ScreenQuad VAO
+
+    // framebuffer
+    m_framebuffer = Mint::Framebuffer::Create({.Width = 1280, .Height = 720, .Attachments = {Mint::FramebufferTextureSpecification(Mint::FramebufferTextureFormat::RGBA8),
+                                                                                                      Mint::FramebufferTextureSpecification(Mint::FramebufferTextureFormat::DEPTH24STENCIL8)}});
 
 }
 
 void ExampleLayer::SetupTextures() {
 
-    m_texture = Mint::Texture2D::Create({.MagFilter = Mint::TextureFilter::Nearest}, "sandbox/assets/pics/Checkerboard.png");
+    m_plane_texture = Mint::Texture2D::Create({.MagFilter = Mint::TextureFilter::Nearest}, "sandbox/assets/pics/Checkerboard.png");
     m_transparent_texture = Mint::Texture2D::Create({.MagFilter = Mint::TextureFilter::Nearest}, "sandbox/assets/pics/ChernoLogo.png");
     m_cube_texture = Mint::Texture2D::Create({.MagFilter = Mint::TextureFilter::Nearest}, "sandbox/assets/pics/Container2.png");
     // m_skybox_texture = Mint::TextureCube::Create("sandbox/assets/pics/Arches_E_PineTree_Radiance.tga");
@@ -170,7 +177,9 @@ void ExampleLayer::SetupTextures() {
 // }
 void ExampleLayer::OnRender(Mint::TimeStep delta_time) {
     // Not sure whether this should be here
+    m_framebuffer->Bind();
     Mint::g_runtime_global_context.m_render_system->Clear({0.1f, 0.1f, 0.1f, 1});
+
 
     // Need to complete scene, adding ECS here
     m_camera.OnUpdate(delta_time);
@@ -188,21 +197,22 @@ void ExampleLayer::OnRender(Mint::TimeStep delta_time) {
     glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5f, 1.5f, 1.5f));
     transform = transform * scale;
 
-    m_texture->Bind();
+    m_plane_texture->Bind();
     auto m_texture_shader = m_shader_library.Get("test_texture");
     m_texture_shader->SetInt("u_Texture", 0); // Texture unit 0
-    Mint::g_runtime_global_context.m_render_system->Submit(m_texture_shader, m_vertex_array, transform);
+    Mint::g_runtime_global_context.m_render_system->Submit(m_texture_shader, m_plane_vao, transform);
 
     m_transparent_texture->Bind();
     m_texture_shader->SetInt("u_Texture", 0); // Texture unit 0
-    Mint::g_runtime_global_context.m_render_system->Submit(m_texture_shader, m_vertex_array, transform);
+    Mint::g_runtime_global_context.m_render_system->Submit(m_texture_shader, m_plane_vao, transform, false);
 
     Mint::g_runtime_global_context.m_render_system->EndScene();
+    m_framebuffer->Unbind();
+    Mint::g_runtime_global_context.m_render_system->Clear({0.1f, 0.1f, 0.1f, 1});
 }
 
 
 void ExampleLayer::RenderCubes() {
-
     glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 0.0f, 0.0f));
     glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
     transform = transform * scale;
@@ -212,9 +222,31 @@ void ExampleLayer::RenderCubes() {
     m_cube_shader->SetInt("u_Texture", 0); // Texture unit 1
     Mint::g_runtime_global_context.m_render_system->SubmitArrays(m_cube_shader, m_cube_vao, GL_TRIANGLES, 36, 0, transform);
 }
+
 void ExampleLayer::RenderSkybox() {
 
 
+}
+
+// 透明物体由远到近绘制
+void ExampleLayer::RenderTransparent() {
+    // 透明物体绘制流程
+
+    // std::map<float, glm::vec3> sorted;
+    // glm::vec3 camPos = m_camera.GetPosition();
+    // for (const auto& pos : m_transparent_positions) {
+    //     float distance = glm::length(camPos - pos);
+    //     sorted[distance] = pos;
+    // }
+
+    // for (auto it = sorted.rbegin(); it != sorted.rend(); ++it) {
+    //     glm::mat4 model = glm::translate(glm::mat4(1.0f), it->second);
+    //     model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+    //     m_transparent_texture->Bind();
+    //     auto m_texture_shader = m_shader_library.Get("test_texture");
+    //     m_texture_shader->SetInt("u_Texture", 0); // Texture unit 0
+    //     Mint::g_runtime_global_context.m_render_system->Submit(m_texture_shader, m_plane_vao, model, false);
+    // }
 }
 
 std::shared_ptr<Mint::Application> Mint::CreateApplication() {

@@ -22,6 +22,7 @@
 #include "render/vertex_array.h"
 #include "render/camera.h"
 #include "render/texture.h"
+#include "render/framebuffer.h"
 
 
 #include "editor/editor_camera.h"

@@ -4,7 +4,6 @@
 
 namespace Mint {
 
-    // 占位符
     Ref<UniformBufferSet> UniformBufferSet::Create() {
         switch (RenderSystem::GetAPI()) {
             case RendererAPI::RenderAPIType::OpenGL:

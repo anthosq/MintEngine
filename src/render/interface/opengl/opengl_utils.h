@@ -2,12 +2,86 @@
 #include "render/interface/opengl/gl_common.h"
 #include "render/texture.h"
 #include "render/shader.h"
+#include "render/framebuffer.h"
 
 namespace Mint {
     namespace Utils {
+
+        // utils for framebuffer
+        static GLenum TOGLFramebufferTexFormat(FramebufferTextureFormat format) {
+            switch (format) {
+                case Mint::FramebufferTextureFormat::RGBA8:             return GL_RGBA8;
+                case Mint::FramebufferTextureFormat::RGBA16F:           return GL_RGBA16F;
+                case Mint::FramebufferTextureFormat::RED_INTEGER:       return GL_RED_INTEGER;
+                case Mint::FramebufferTextureFormat::DEPTH24STENCIL8:   return GL_DEPTH24_STENCIL8;
+            }
+            return 0;
+        }
+
+        static GLenum TextureTarget(bool multisample) {
+            return multisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+        }
+
+        static void CreateTextures(bool multisample, uint32_t* outID, uint32_t count) {
+            glCreateTextures(TextureTarget(multisample), count, outID);
+        }
+
+        static void BindTexture(bool multisample, uint32_t id) {
+            glBindTexture(TextureTarget(multisample), id);
+        }
+
+        static void AttachColorTexture(uint32_t id, int samples, GLenum internalFormat,
+                                       GLenum format, uint32_t width, uint32_t height, int index) {
+            bool multisample = samples > 1;
+            if (multisample) {
+                glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, internalFormat,
+                                        width, height, GL_FALSE);
+            } else {
+                glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height,
+                             0, format, GL_UNSIGNED_BYTE, nullptr);
+
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            }
+
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
+                                   TextureTarget(multisample), id, 0);
+        }
+
+        static void AttachDepthTexture(uint32_t id, int samples, GLenum format, GLenum attachmentType,
+                                      uint32_t width, uint32_t height) {
+            bool multisample = samples > 1;
+            if (multisample) {
+                glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format,
+                                        width, height, GL_FALSE);
+            } else {
+                glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
+
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            }
+
+            glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType,
+                                   TextureTarget(multisample), id, 0);
+        }
+
+        static bool IsDepthFormat(FramebufferTextureFormat format) {
+            switch (format) {
+                case Mint::FramebufferTextureFormat::DEPTH24STENCIL8:
+                    return true;
+            }
+            return false;
+        }
+
+        // utils for texture
         static GLenum ToGLTextureFormat(TextureFormat format){
-            switch (format)
-            {
+            switch (format) {
                 case Mint::TextureFormat::RGB8:     return GL_RGB8;
                 case Mint::TextureFormat::RGBA8:    return GL_RGBA8;
                 case Mint::TextureFormat::SRGB8:    return GL_SRGB8;

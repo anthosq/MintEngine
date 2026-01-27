@@ -89,7 +89,7 @@ namespace Mint {
     // Need to implement WaitAndExcute(), to support rendercommand queue
     // Need to move SetMat4 to uniform buffer instead of setting it one by one
     // move submit to render command, receiving lambda
-    void RenderSystem::Submit(Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transform) {
+    void RenderSystem::Submit(Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transform, bool depth_test) {
         // not sure
         glm::mat4 viewProj = m_sceneData->viewProjectionMatrix;
         shader->Bind();
@@ -97,17 +97,17 @@ namespace Mint {
         // Model matrix
         shader->SetMat4("u_Transform", transform);
         vertex_array->Bind();
-        DrawIndexed(vertex_array->GetIndexBuffer()->GetCount());
+        DrawIndexed(vertex_array->GetIndexBuffer()->GetCount(), depth_test);
     }
 
     // temp?
-    void RenderSystem::SubmitArrays(Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, uint32_t mode, uint32_t count, uint32_t first, const glm::mat4& transform) {
+    void RenderSystem::SubmitArrays(Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, uint32_t mode, uint32_t count, uint32_t first, const glm::mat4& transform, bool depth_test) {
         glm::mat4 viewProj = m_sceneData->viewProjectionMatrix;
         shader->Bind();
         shader->SetMat4("u_ViewProjection", viewProj);
         // Model matrix
         shader->SetMat4("u_Transform", transform);
         vertex_array->Bind();
-        DrawArrays(mode, count, first);
+        DrawArrays(mode, count, first, depth_test);
     }
 }

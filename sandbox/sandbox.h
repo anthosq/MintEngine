@@ -20,13 +20,14 @@ public:
     void OnRender(Mint::TimeStep delta_time);
     void RenderCubes();
     void RenderSkybox();
+    void RenderTransparent();
 
 private:
     Mint::ShaderLibrary m_shader_library;
 
-    Mint::Ref<Mint::Shader> m_shader;
-    Mint::Ref<Mint::VertexArray> m_vertex_array;
-    Mint::Ref<Mint::Texture2D> m_texture;
+    Mint::Ref<Mint::Shader> m_plane_shader;
+    Mint::Ref<Mint::VertexArray> m_plane_vao;
+    Mint::Ref<Mint::Texture2D> m_plane_texture;
 
     // Cube
     Mint::Ref<Mint::Shader> m_cube_shader;
@@ -44,7 +45,9 @@ private:
     // skybox
     Mint::Ref<Mint::Shader> m_skybox_shader;
     Mint::Ref<Mint::TextureCube> m_skybox_texture, m_skybox_irradiance_texture;
-    
+
+    // framebuffer
+    Mint::Ref<Mint::Framebuffer> m_framebuffer;
 };
 
 

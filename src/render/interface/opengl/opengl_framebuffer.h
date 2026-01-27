@@ -21,13 +21,13 @@ namespace Mint {
 
         virtual void BindTexture(uint32_t attachmentIndex, uint32_t slot = 0) const override;
 
-        virtual uint32_t GetWidth() const override { return m_Width; }
-        virtual uint32_t GetHeight() const override { return m_Height; }
+        virtual uint32_t GetWidth() const override { return m_Specification.Width; }
+        virtual uint32_t GetHeight() const override { return m_Specification.Height; }
 
         virtual uint32_t GetRendererID() const override { return m_RendererID; }
 
-        // uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const;
-        // uint32_t GetDepthAttachmentRendererID() const { return m_DepthAttachment; }
+        uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const;
+        uint32_t GetDepthAttachmentRendererID() const { return m_DepthAttachment; }
 
         virtual const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
 
@@ -37,10 +37,10 @@ namespace Mint {
     private:
         uint32_t m_RendererID = 0;
         FramebufferSpecification m_Specification;
-        uint32_t m_Width = 0, m_Height = 0;
+        // uint32_t m_Width = 0, m_Height = 0;
 
-        // std::vector<FramebufferTextureSpecification> m_ColorAttachmentSpecs;
-        // FramebufferTextureSpecification m_DepthAttachmentSpec = FramebufferTextureFormat::None;
+        std::vector<FramebufferTextureSpecification> m_ColorAttachmentSpecs;
+        FramebufferTextureSpecification m_DepthAttachmentSpec = FramebufferTextureFormat::None;
 
         std::vector<uint32_t> m_ColorAttachments;
         uint32_t m_DepthAttachment = 0;
