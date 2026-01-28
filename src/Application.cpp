@@ -10,11 +10,11 @@ namespace Mint {
 
     Application *Application::s_instance = nullptr;
 
-    Application::Application() {
+    Application::Application(const ApplicationProps& props) {
         s_instance = this;
         // 之后会重命名Application为MintEngine, 并且把构造函数内的部分内容移到Init函数中
         // window, renderer之类的子系统转移由RuntimeGlobalContext进行管理, 进行初始化
-        m_window = std::unique_ptr<Window>(Window::Create(WindowCreateInfo()));
+        m_window = std::unique_ptr<Window>(Window::Create(WindowCreateInfo(props.WindowWidth, props.WindowHeight, props.Name.c_str())));
         // 成员函数指针与std::function不兼容, std::function需要一个可调用对象
         // 所以成员指针需要使用std::bind创一个新的可调用对象
         // 或者使用lambda [this](Event& e) { this->OnEvent(e); }
@@ -99,14 +99,27 @@ namespace Mint {
         return true;
     }
 
+    void Application::Close() {
+        m_running = false;
+        LOG_INFO("Application closed.");
+    }
+
     bool Application::OnWindowResize(WindowResizeEvent& e) {
         g_runtime_global_context.m_render_system->OnWindowResize(e.GetWidth(), e.GetHeight());
-        LOG_INFO(fmt::format("Window resized to: ({0}, {1})", e.GetWidth(), e.GetHeight()));
-        if (e.GetWidth() == 0 || e.GetHeight() == 0) {
+        // LOG_INFO(fmt::format("Window resized to: ({0}, {1})", e.GetWidth(), e.GetHeight()));
+        int width = e.GetWidth();
+        int height = e.GetHeight();
+        if (width == 0 || height == 0) {
             m_minimized = true;
             return false;
         }
         m_minimized = false;
+        RenderSystem::Submit([=]() {
+            glViewport(0, 0, width, height);
+        });
+        // TODO: 针对所有的framebuffer调用Resize
+        // 或许需要实现framebuffer pool
+
         return false;
     }
 

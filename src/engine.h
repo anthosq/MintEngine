@@ -26,7 +26,3 @@
 
 
 #include "editor/editor_camera.h"
-
-// Entry point
-#include "EntryPoint.h"
-// ----- -----

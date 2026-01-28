@@ -9,7 +9,9 @@ namespace Mint {
         const char* title = "Mint Engine";
 
         bool is_fullscreen = false;
-        
+
+        WindowCreateInfo(unsigned int w, unsigned int h, const char* t)
+            : width(w), height(h), title(t) {}
     };
 
     class Window {

@@ -28,7 +28,7 @@ add_library(${TARGET_NAME} STATIC
 )
 
 # test?
-add_subdirectory(3rdparty)
+add_subdirectory(${THIRD_PARTY_DIR})
 
 target_include_directories(${TARGET_NAME}
     PUBLIC

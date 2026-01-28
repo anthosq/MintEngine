@@ -1,6 +1,8 @@
-#include "sandbox.h"
+#include "editor_layer.h"
 #include <map>
 
+
+namespace Mint {
 // temporary data for test
 static float vertices[4 * 5] = {
     -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
@@ -56,7 +58,7 @@ static float cube_vertices[] = {
 };
 
 
-ExampleLayer::ExampleLayer() : Layer("Example"), m_camera(60, 1600.0f / 900.0f, 0.1f, 100.0f), // 16:9 纵横比
+EditorLayer::EditorLayer() : Layer("Example"), m_camera(60, 1600.0f / 900.0f, 0.1f, 100.0f), // 16:9 纵横比
                                rectangle_transform({0.0f, 0.0f, 0.0f}) {
     // Mint::LOG_INFO("ExampleLayer::OnAttach");
 
@@ -67,7 +69,7 @@ ExampleLayer::ExampleLayer() : Layer("Example"), m_camera(60, 1600.0f / 900.0f, 
 
 }
 
-void ExampleLayer::OnUpdate(Mint::TimeStep delta_time) {
+void EditorLayer::OnUpdate(Mint::TimeStep delta_time) {
     // Mint::LOG_INFO("ExampleLayer::OnUpdate");
     // 后续处理动作逻辑可以采用这种轮询的方式？
     // if (Mint::Input::IsKeyPressed(Mint::Key::A)) {
@@ -76,7 +78,7 @@ void ExampleLayer::OnUpdate(Mint::TimeStep delta_time) {
 
 }
 
-void ExampleLayer::OnEvent(Mint::Event& e) {
+void EditorLayer::OnEvent(Mint::Event& e) {
     // Mint::LOG_INFO("ExampleLayer::OnEvent");
     // if (e.GetEventType() == Mint::EventType::KeyPressed) {
     //     Mint::KeyPressedEvent& event = (Mint::KeyPressedEvent&)e;
@@ -88,12 +90,82 @@ void ExampleLayer::OnEvent(Mint::Event& e) {
     m_camera.OnEvent(e);
 }
 
-void ExampleLayer::OnImGuiRender() {
-    ImGui::Begin("Settings");
-    ImGui::ColorEdit3("Rectangle Color", glm::value_ptr(rectangle_color));
+void EditorLayer::OnImGuiRender() {
+    static bool dockspaceOpen = true;
+    static bool opt_fullscreen_persistant = true;
+    bool opt_fullscreen = opt_fullscreen_persistant;
+    static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 
-    ImGui::Separator();
-    ImGui::Text("Camera Debug");
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+    if (opt_fullscreen)
+    {
+        ImGuiViewport *viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(viewport->Pos);
+        ImGui::SetNextWindowSize(viewport->Size);
+        ImGui::SetNextWindowViewport(viewport->ID);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+        window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+        window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+    }
+
+    if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
+        window_flags |= ImGuiWindowFlags_NoBackground;
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+    ImGui::Begin("Mint Editor DockSpace", &dockspaceOpen, window_flags);
+    ImGui::PopStyleVar();
+
+    if (opt_fullscreen)
+        ImGui::PopStyleVar(2);
+
+    // DockSpace
+    ImGuiIO &io = ImGui::GetIO();
+    if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+    {
+        ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+        ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+    }
+
+    if (ImGui::BeginMenuBar())
+    {
+        if (ImGui::BeginMenu("File"))
+        {
+            if (ImGui::MenuItem("Exit"))
+                g_runtime_global_context.m_application->Close();
+            ImGui::EndMenu();
+        }
+        ImGui::EndMenuBar();
+    }
+
+    // Viewport
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
+    ImGui::Begin("Viewport");
+
+    ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+
+    ImGui::SetCursorPos(ImVec2(10, 10));
+
+    if (viewportPanelSize.x > 0.0f && viewportPanelSize.y > 0.0f) {
+        m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
+    }
+
+    m_ViewportFocused = ImGui::IsWindowFocused();
+    m_ViewportHovered = ImGui::IsWindowHovered();
+
+    // 关键：如果不阻止 Input，鼠标在 ImGui 窗口操作时也会移动 3D 相机
+    // Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
+
+    m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
+
+    uint32_t textureID = m_framebuffer->GetColorAttachmentRendererID();
+    ImGui::Image((void *)(uintptr_t)textureID, ImVec2{1280.0f, 720.0f}, ImVec2{0, 1}, ImVec2{1, 0});
+
+    ImGui::End();
+    ImGui::PopStyleVar();
+
+    // --- 其他面板 ---
+    ImGui::Begin("Camera Stats");
     auto pos = m_camera.GetPosition();
     ImGui::Text("Position: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
     ImGui::Text("Distance: %.2f", m_camera.GetDistance());
@@ -106,17 +178,20 @@ void ExampleLayer::OnImGuiRender() {
                 m_camera.GetFocalPoint().x,
                 m_camera.GetFocalPoint().y,
                 m_camera.GetFocalPoint().z);
+    ImGui::Text("Viewport Size: %.1f, %.1f", viewportPanelSize.x, viewportPanelSize.y);
     ImGui::End();
+    ImGui::End(); // End DockSpace
 }
 
+
 // Setup Utils
-void ExampleLayer::SetupShaders() {
+void EditorLayer::SetupShaders() {
     m_plane_shader = Mint::Shader::Create("sandbox/assets/shaders/test_shader.glsl");
     m_shader_library.Load("sandbox/assets/shaders/test_texture.glsl");
     m_shader_library.Load("sandbox/assets/shaders/cube_shader.glsl");
 }
 
-void ExampleLayer::SetupBuffers() {
+void EditorLayer::SetupBuffers() {
 
     // Cube
     m_cube_vao = Mint::VertexArray::Create();
@@ -152,9 +227,13 @@ void ExampleLayer::SetupBuffers() {
 
     // ScreenQuad VAO
 
+    // framebuffer
+    m_framebuffer = Mint::Framebuffer::Create({.Width = 1280, .Height = 720, .Attachments = {Mint::FramebufferTextureSpecification(Mint::FramebufferTextureFormat::RGBA8),
+                                                                                                      Mint::FramebufferTextureSpecification(Mint::FramebufferTextureFormat::DEPTH24STENCIL8)}});
+
 }
 
-void ExampleLayer::SetupTextures() {
+void EditorLayer::SetupTextures() {
 
     m_plane_texture = Mint::Texture2D::Create({.MagFilter = Mint::TextureFilter::Nearest}, "sandbox/assets/pics/Checkerboard.png");
     m_transparent_texture = Mint::Texture2D::Create({.MagFilter = Mint::TextureFilter::Nearest}, "sandbox/assets/pics/ChernoLogo.png");
@@ -169,13 +248,19 @@ void ExampleLayer::SetupTextures() {
 // void ExampleLayer::RenderScene() {
 
 // }
-void ExampleLayer::OnRender(Mint::TimeStep delta_time) {
-    // Not sure whether this should be here
+void EditorLayer::OnRender(Mint::TimeStep delta_time) {
+
+
+    m_framebuffer->Bind();
     Mint::g_runtime_global_context.m_render_system->Clear({0.1f, 0.1f, 0.1f, 1});
 
 
     // Need to complete scene, adding ECS here
-    m_camera.OnUpdate(delta_time);
+
+    if (m_ViewportFocused) {
+        m_camera.OnUpdate(delta_time);
+    }
+
     Mint::g_runtime_global_context.m_render_system->BeginScene(m_camera);
 
     RenderCubes();
@@ -200,10 +285,12 @@ void ExampleLayer::OnRender(Mint::TimeStep delta_time) {
     Mint::g_runtime_global_context.m_render_system->Submit(m_texture_shader, m_plane_vao, transform, false);
 
     Mint::g_runtime_global_context.m_render_system->EndScene();
+    m_framebuffer->Unbind();
+    Mint::g_runtime_global_context.m_render_system->Clear({0.1f, 0.1f, 0.1f, 1});
 }
 
 
-void ExampleLayer::RenderCubes() {
+void EditorLayer::RenderCubes() {
     glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 0.0f, 0.0f));
     glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
     transform = transform * scale;
@@ -214,13 +301,13 @@ void ExampleLayer::RenderCubes() {
     Mint::g_runtime_global_context.m_render_system->SubmitArrays(m_cube_shader, m_cube_vao, GL_TRIANGLES, 36, 0, transform);
 }
 
-void ExampleLayer::RenderSkybox() {
+void EditorLayer::RenderSkybox() {
 
 
 }
 
 // 透明物体由远到近绘制
-void ExampleLayer::RenderTransparent() {
+void EditorLayer::RenderTransparent() {
     // 透明物体绘制流程
 
     // std::map<float, glm::vec3> sorted;
@@ -239,7 +326,4 @@ void ExampleLayer::RenderTransparent() {
     //     Mint::g_runtime_global_context.m_render_system->Submit(m_texture_shader, m_plane_vao, model, false);
     // }
 }
-
-std::shared_ptr<Mint::Application> Mint::CreateApplication() {
-    return std::make_shared<Sandbox>();
 }

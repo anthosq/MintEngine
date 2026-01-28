@@ -19,6 +19,7 @@ include(CMakeDependentOption)
 set(MINT_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(SOURCE_DIR "${MINT_ROOT_DIR}/src")
 set(MINT_SANDBOX_DIR "${MINT_ROOT_DIR}/sandbox")
+set(MINT_EDITOR_DIR "${MINT_ROOT_DIR}/MintEditor")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${MINT_ROOT_DIR}/bin")
 
@@ -32,6 +33,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${MINT_ROOT_DIR}/bin")
 # )
 
 add_subdirectory("${SOURCE_DIR}")
+add_subdirectory("${MINT_EDITOR_DIR}")
 add_executable(Mint ${MINT_SANDBOX_DIR}/sandbox.cpp)
 
 

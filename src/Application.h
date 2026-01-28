@@ -20,14 +20,21 @@
 
 #include <chrono>
 namespace Mint {
+    struct ApplicationProps {
+        std::string Name;
+        uint32_t WindowWidth, WindowHeight;
+    };
+
     class Application { 
     public:
-        Application();
+        Application(const ApplicationProps& props = {"Mint Engine", 1280, 720});
         virtual ~Application();
 
         void Run();
         void OnEvent(Event& e);
         void OnImGuiRender();
+
+        void Close();
 
         void PushLayer(Layer* layer);
         void PushOverlay(Layer* overlay);

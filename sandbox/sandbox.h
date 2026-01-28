@@ -1,5 +1,6 @@
 #include <iostream>
 #include "engine.h"
+#include "EntryPoint.h"
 
 class ExampleLayer : public Mint::Layer {
 public:
@@ -46,8 +47,6 @@ private:
     Mint::Ref<Mint::Shader> m_skybox_shader;
     Mint::Ref<Mint::TextureCube> m_skybox_texture, m_skybox_irradiance_texture;
 
-    // framebuffer
-    Mint::Ref<Mint::Framebuffer> m_framebuffer;
 };
 
 
