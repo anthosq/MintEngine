@@ -138,16 +138,17 @@ void EditorLayer::OnImGuiRender() {
         ImGui::EndMenuBar();
     }
 
-    // Viewport
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
+
     ImGui::Begin("Viewport");
 
     ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 
     ImGui::SetCursorPos(ImVec2(10, 10));
 
-    if (viewportPanelSize.x > 0.0f && viewportPanelSize.y > 0.0f) {
+    if (viewportPanelSize.x > 0.0f && viewportPanelSize.y > 0.0f && (viewportPanelSize.x != m_ViewportSize.x || viewportPanelSize.y != m_ViewportSize.y)) {
         m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
+        m_framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
     }
 
     m_ViewportFocused = ImGui::IsWindowFocused();
@@ -156,15 +157,14 @@ void EditorLayer::OnImGuiRender() {
     // 关键：如果不阻止 Input，鼠标在 ImGui 窗口操作时也会移动 3D 相机
     // Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 
-    m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
+    // m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
 
     uint32_t textureID = m_framebuffer->GetColorAttachmentRendererID();
-    ImGui::Image((void *)(uintptr_t)textureID, ImVec2{1280.0f, 720.0f}, ImVec2{0, 1}, ImVec2{1, 0});
+    ImGui::Image((void *)(uintptr_t)textureID, ImVec2{m_ViewportSize.x, m_ViewportSize.y}, ImVec2{0, 1}, ImVec2{1, 0});
 
     ImGui::End();
     ImGui::PopStyleVar();
 
-    // --- 其他面板 ---
     ImGui::Begin("Camera Stats");
     auto pos = m_camera.GetPosition();
     ImGui::Text("Position: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
@@ -180,6 +180,8 @@ void EditorLayer::OnImGuiRender() {
                 m_camera.GetFocalPoint().z);
     ImGui::Text("Viewport Size: %.1f, %.1f", viewportPanelSize.x, viewportPanelSize.y);
     ImGui::End();
+
+
     ImGui::End(); // End DockSpace
 }
 
