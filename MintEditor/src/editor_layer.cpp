@@ -129,7 +129,7 @@ void EditorLayer::OnImGuiRender() {
 
     if (ImGui::BeginMenuBar())
     {
-        if (ImGui::BeginMenu("File"))
+        if (ImGui::BeginMenu("Menu"))
         {
             if (ImGui::MenuItem("Exit"))
                 g_runtime_global_context.m_application->Close();
@@ -146,15 +146,20 @@ void EditorLayer::OnImGuiRender() {
 
     ImGui::SetCursorPos(ImVec2(10, 10));
 
+    // 之后移动到渲染主循环中
     if (viewportPanelSize.x > 0.0f && viewportPanelSize.y > 0.0f && (viewportPanelSize.x != m_ViewportSize.x || viewportPanelSize.y != m_ViewportSize.y)) {
         m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
+
+        // 相机视角调整依旧有问题?
+        // 猜测: 渲染顺序问题导致, framebuffer的Bind在OnRender开头才生效
+        // 而OnImGuiRender的调用发生在最后, 导致实际结果是画面发生形变拉伸
         m_framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
     }
 
     m_ViewportFocused = ImGui::IsWindowFocused();
     m_ViewportHovered = ImGui::IsWindowHovered();
 
-    // 关键：如果不阻止 Input，鼠标在 ImGui 窗口操作时也会移动 3D 相机
+    // TODO: BlockEvents需要在Application拆解出来
     // Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 
     // m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
@@ -253,8 +258,13 @@ void EditorLayer::SetupTextures() {
 void EditorLayer::OnRender(Mint::TimeStep delta_time) {
 
 
+    // 调用Bind会重新设置glViewport
     m_framebuffer->Bind();
     Mint::g_runtime_global_context.m_render_system->Clear({0.1f, 0.1f, 0.1f, 1});
+
+
+    // TODO: fix framebuffer resize(actually editor_camera need to be reviewed)
+    // TODO: need to fix ImGui layer event
 
 
     // Need to complete scene, adding ECS here
@@ -269,10 +279,10 @@ void EditorLayer::OnRender(Mint::TimeStep delta_time) {
 
     RenderSkybox();
 
-    // TODO: Move to OnRender function
     // temporary transform function
     // for each object, compute transform matrix
 
+    // render plane
     glm::mat4 transform = glm::translate(glm::mat4(1.0f), rectangle_transform);
     glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5f, 1.5f, 1.5f));
     transform = transform * scale;

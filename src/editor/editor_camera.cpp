@@ -7,6 +7,7 @@
 
 namespace Mint {
     // View与Projection矩阵分开储存, Camera基类只负责Projection矩阵的计算与储存
+    // 需要考虑orthognal camera 的实现
     // EditorCamera负责View矩阵的计算与储存以及交互逻辑
     EditorCamera::EditorCamera(float degFov, float aspectRatio, float nearClip, float farClip)
         : Camera(glm::perspective(glm::radians(degFov), aspectRatio, farClip, nearClip),
@@ -148,6 +149,7 @@ namespace Mint {
     }
 
     // !!!! TODO: Focus需要调整, 当Position在FocalPoint后面时会出现问题
+    // 这部分问题在实现了color picking后应该会解决, 因为ARC mode会将focus_point设置为选定的物体
     void EditorCamera::Focus(const glm::vec3& focus_point) {
         m_focal_point = focus_point;
         m_camera_mode = CameraMode::FLYCAM;
