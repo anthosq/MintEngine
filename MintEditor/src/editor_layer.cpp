@@ -153,7 +153,7 @@ void EditorLayer::OnImGuiRender() {
         // 相机视角调整依旧有问题?
         // 猜测: 渲染顺序问题导致, framebuffer的Bind在OnRender开头才生效
         // 而OnImGuiRender的调用发生在最后, 导致实际结果是画面发生形变拉伸
-        m_framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+        // m_framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
     }
 
     m_ViewportFocused = ImGui::IsWindowFocused();
@@ -257,6 +257,13 @@ void EditorLayer::SetupTextures() {
 // }
 void EditorLayer::OnRender(Mint::TimeStep delta_time) {
 
+		if (FramebufferSpecification spec = m_framebuffer->GetSpecification();
+			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && // zero sized framebuffer is invalid
+			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
+		{
+			m_framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_camera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
+		}
 
     // 调用Bind会重新设置glViewport
     m_framebuffer->Bind();

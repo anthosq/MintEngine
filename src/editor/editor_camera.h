@@ -41,6 +41,7 @@ namespace Mint {
             void SetViewportSize(float width, float height) {
                 m_aspect_ratio = width / height;
                 SetPerspectiveProjection(m_vertical_fov, m_aspect_ratio, m_nearClip, m_farClip);
+
             }
 
             bool IsActive() const { return m_active; }

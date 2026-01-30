@@ -14,6 +14,13 @@ namespace Mint {
                  glm::perspective(glm::radians(degFov), aspectRatio, nearClip, farClip))
     {
         // for test
+
+        // test
+        m_vertical_fov = degFov;
+        m_aspect_ratio = aspectRatio;
+        m_nearClip = nearClip;
+        m_farClip = farClip;
+
         m_active = true;
         Init();
     }

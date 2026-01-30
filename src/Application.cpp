@@ -117,8 +117,9 @@ namespace Mint {
         RenderSystem::Submit([=]() {
             glViewport(0, 0, width, height);
         });
-        // TODO: 针对所有的framebuffer调用Resize
-        // 或许需要实现framebuffer pool
+
+
+        // TODO: 这里需要调整, 因为运行Mint时似乎还会有问题
 
         return false;
     }
