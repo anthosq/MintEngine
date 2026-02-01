@@ -139,7 +139,6 @@ void EditorLayer::OnImGuiRender() {
     }
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
-
     ImGui::Begin("Viewport");
 
     ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();

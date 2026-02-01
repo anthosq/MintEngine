@@ -21,6 +21,7 @@ namespace Mint {
                 OpenGL = 1,
             };
         public:
+            virtual ~RendererAPI() = default;
 
             virtual void Init() = 0;
 

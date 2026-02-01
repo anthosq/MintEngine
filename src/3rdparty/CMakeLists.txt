@@ -52,3 +52,11 @@ if(NOT TARGET stb_image)
     )
     set_target_properties(stb_image PROPERTIES FOLDER ${third_party_dir}/stb_image)
 endif()
+
+if (NOT TARGET entt)
+    add_library(entt INTERFACE)
+    target_include_directories(entt INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/entt>
+        $<INSTALL_INTERFACE:include>
+    )
+endif()
