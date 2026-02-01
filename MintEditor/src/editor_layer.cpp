@@ -148,20 +148,12 @@ void EditorLayer::OnImGuiRender() {
     // 之后移动到渲染主循环中
     if (viewportPanelSize.x > 0.0f && viewportPanelSize.y > 0.0f && (viewportPanelSize.x != m_ViewportSize.x || viewportPanelSize.y != m_ViewportSize.y)) {
         m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-
-        // 相机视角调整依旧有问题?
-        // 猜测: 渲染顺序问题导致, framebuffer的Bind在OnRender开头才生效
-        // 而OnImGuiRender的调用发生在最后, 导致实际结果是画面发生形变拉伸
-        // m_framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
     }
 
     m_ViewportFocused = ImGui::IsWindowFocused();
     m_ViewportHovered = ImGui::IsWindowHovered();
 
-    // TODO: BlockEvents需要在Application拆解出来
-    // Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
-
-    // m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
+    Application::GetInstance().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 
     uint32_t textureID = m_framebuffer->GetColorAttachmentRendererID();
     ImGui::Image((void *)(uintptr_t)textureID, ImVec2{m_ViewportSize.x, m_ViewportSize.y}, ImVec2{0, 1}, ImVec2{1, 0});

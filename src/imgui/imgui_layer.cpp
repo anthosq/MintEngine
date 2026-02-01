@@ -1,6 +1,8 @@
 #include "imgui_layer.h"
 #include "Application.h"
 
+#include <imgui/imgui_internal.h>
+
 #include "render/interface/opengl/gl_common.h"
 #include "log_system.h"
 // -----------------    
@@ -68,7 +70,11 @@ namespace Mint {
     // }
 
     void ImGuiLayer::OnEvent(Event& event) {
-
+        if (m_blockEvents) {
+            ImGuiIO& io = ImGui::GetIO();
+            event.m_Handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+            event.m_Handled |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+        }
     }
 
     void ImGuiLayer::Begin() {
@@ -93,6 +99,11 @@ namespace Mint {
             glfwMakeContextCurrent(backup_current_context);
         }
     }
+
+    uint32_t ImGuiLayer::GetActiveWindowID() const {
+        return GImGui->ActiveId;
+    }
+
 
     void ImGuiLayer::OnImGuiRender() {
         // static bool show = true;

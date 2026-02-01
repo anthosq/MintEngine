@@ -39,6 +39,8 @@ namespace Mint {
         void PushLayer(Layer* layer);
         void PushOverlay(Layer* overlay);
         inline Window& GetWindow() { return *m_window; }
+        inline ImGuiLayer* GetImGuiLayer() { return m_imgui_layer; }
+
         inline static Application& GetInstance() { return *s_instance; }
 
         float CalculateDeltaTime();

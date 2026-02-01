@@ -25,6 +25,10 @@ namespace Mint {
 
             virtual void OnImGuiRender() override;
 
+            void BlockEvents(bool block) { m_blockEvents = block; }
+            uint32_t GetActiveWindowID() const; 
         private:
+            bool m_blockEvents = true;
+
     };
 }

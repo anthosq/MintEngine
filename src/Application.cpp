@@ -38,11 +38,11 @@ namespace Mint {
         dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose));
         dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::OnWindowResize));
 
-        for (auto it = m_layer_stack.end(); it != m_layer_stack.begin(); ) {
-            (*--it)->OnEvent(e);
-            if (e.IsHandled()) {
+        for (auto it = m_layer_stack.rbegin(); it != m_layer_stack.rend(); ++it) {
+            if (e.m_Handled) {
                 break;
             }
+            (*it)->OnEvent(e);
         }
     }
 
