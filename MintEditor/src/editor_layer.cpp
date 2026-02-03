@@ -66,6 +66,8 @@ EditorLayer::EditorLayer() : Layer("Example"), m_camera(60, 1600.0f / 900.0f, 0.
     SetupShaders();
     SetupBuffers();
     SetupTextures();
+    // m_active_scene = Create<Mint::Scene>();
+
 
 }
 
@@ -139,13 +141,10 @@ void EditorLayer::OnImGuiRender() {
     }
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
-    ImGui::Begin("Viewport");
+    ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
 
     ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 
-    ImGui::SetCursorPos(ImVec2(10, 10));
-
-    // 之后移动到渲染主循环中
     if (viewportPanelSize.x > 0.0f && viewportPanelSize.y > 0.0f && (viewportPanelSize.x != m_ViewportSize.x || viewportPanelSize.y != m_ViewportSize.y)) {
         m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
     }
@@ -175,6 +174,9 @@ void EditorLayer::OnImGuiRender() {
                 m_camera.GetFocalPoint().y,
                 m_camera.GetFocalPoint().z);
     ImGui::Text("Viewport Size: %.1f, %.1f", viewportPanelSize.x, viewportPanelSize.y);
+    // 调整test_data的颜色
+    ImGui::Text("Test Data Color:");
+    ImGui::ColorEdit4("Test Color", glm::value_ptr(test_color));
     ImGui::End();
 
 
@@ -205,6 +207,9 @@ void EditorLayer::SetupBuffers() {
     // cube_ibo = Mint::IndexBuffer::Create(cube_indices, sizeof(cube_indices));
     // m_cube_vao->SetIndexBuffer(cube_ibo);
 
+    // Test UBO
+    test_color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    m_material_ubo = Mint::UniformBuffer::Create(sizeof(test_color), 0);
 
     // Test plane
     m_plane_vao = Mint::VertexArray::Create();
@@ -248,13 +253,12 @@ void EditorLayer::SetupTextures() {
 // }
 void EditorLayer::OnRender(Mint::TimeStep delta_time) {
 
-		if (FramebufferSpecification spec = m_framebuffer->GetSpecification();
-			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && // zero sized framebuffer is invalid
-			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
-		{
-			m_framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-			m_camera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
-		}
+    if (FramebufferSpecification spec = m_framebuffer->GetSpecification();
+        m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && // zero sized framebuffer is invalid
+        (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y)) {
+        m_framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+        m_camera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
+    }
 
     // 调用Bind会重新设置glViewport
     m_framebuffer->Bind();
@@ -279,6 +283,10 @@ void EditorLayer::OnRender(Mint::TimeStep delta_time) {
 
     // temporary transform function
     // for each object, compute transform matrix
+
+    // test material
+
+    m_material_ubo->SetData(&test_color, sizeof(test_color), 0);
 
     // render plane
     glm::mat4 transform = glm::translate(glm::mat4(1.0f), rectangle_transform);

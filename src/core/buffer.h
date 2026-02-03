@@ -29,6 +29,13 @@ namespace Mint {
             return buffer;
         }
 
+        static Buffer Copy(const void* data, uint32_t size) {
+            Buffer buffer;
+            buffer.Allocate(size);
+            if(size) memcpy(buffer.Data, data, size);
+            return buffer;
+        }
+
         void Allocate(uint32_t size) {
             delete[] (byte*)Data;
             Data = nullptr;

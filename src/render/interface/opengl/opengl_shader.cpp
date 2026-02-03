@@ -169,12 +169,26 @@ namespace Mint {
             ShaderUniformType uniformType = Utils::GLTypeToShaderUniformType(type);
             uint32_t uniformSize = Utils::GetShaderUniformSize(uniformType);
 
+            int offset = -1;
+            int blockIndex = -1;
+
+            glGetActiveUniformsiv(m_renderer_id, 1, (GLuint*)&i, GL_UNIFORM_BLOCK_INDEX, &blockIndex);
+
+            if (blockIndex != -1) {
+                glGetActiveUniformsiv(m_renderer_id, 1, (GLuint*)&i, GL_UNIFORM_OFFSET, &offset);
+            }
+
             m_uniforms[uniformName] = ShaderUniform(uniformName, uniformType, uniformSize, offset);
 
-            offset += uniformSize;
+            // offset += uniformSize;
 
-            LOG_INFO(fmt::format("  Name: {0}, Type: {1}, Size: {2}, Offset: {3}", 
-                uniformName, ShaderUniform::UniformTypeToString(uniformType), uniformSize, offset));
+            if (blockIndex != -1) {
+                LOG_INFO(fmt::format("  Name: {0}, Type: {1}, Size: {2}, Offset: {3} [UBO]", 
+                    uniformName, ShaderUniform::UniformTypeToString(uniformType), uniformSize, offset));
+            } else {
+                 LOG_INFO(fmt::format("  Name: {0}, Type: {1}, Size: {2}, Offset: {3} [Default]", 
+                    uniformName, ShaderUniform::UniformTypeToString(uniformType), uniformSize, offset));
+            }
         }
     }
 

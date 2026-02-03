@@ -23,6 +23,9 @@
 #include "render/camera.h"
 #include "render/texture.h"
 #include "render/framebuffer.h"
+#include "render/uniform_buffer.h"
 
+// Scene
+#include "scene/scene.h"
 
 #include "editor/editor_camera.h"

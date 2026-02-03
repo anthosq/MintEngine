@@ -12,10 +12,10 @@ namespace Mint {
     // OpenGLUniformBuffer实现显存分配和数据上传, 提供GetRenderID
     class UniformBuffer : public RefCounter {
     public:
-        virtual ~UniformBuffer();
+        virtual ~UniformBuffer() {};
         virtual void SetData(const void* data, uint32_t size, uint32_t offset) = 0;
         virtual void RenderThread_SetData(const void* data, uint32_t size, uint32_t offset) = 0;
 
-        static Ref<UniformBuffer> Create(uint32_t size);
+        static Ref<UniformBuffer> Create(uint32_t size, uint32_t binding);
     };
 }

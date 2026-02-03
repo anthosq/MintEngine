@@ -50,6 +50,13 @@ namespace Mint {
         // framebuffer
         Mint::Ref<Mint::Framebuffer> m_framebuffer;
 
+        // Scene
+        Mint::Ref<Mint::Scene> m_active_scene;
+
+        // Test UBO
+        Mint::Ref<Mint::UniformBuffer> m_material_ubo;
+        glm::vec4 test_color;
+
         // view port
         glm::vec2 m_ViewportSize = {1280.0f, 720.0f};
         bool m_ViewportFocused = false;

@@ -5,10 +5,10 @@
 
 namespace Mint {
 
-    Ref<UniformBuffer> UniformBuffer::Create(uint32_t size) {
+    Ref<UniformBuffer> UniformBuffer::Create(uint32_t size, uint32_t binding) {
         switch (RenderSystem::GetAPI()) {
             case RendererAPI::RenderAPIType::OpenGL:
-                return Ref<OpenGLUniformBuffer>::Create(size);
+                return Ref<OpenGLUniformBuffer>::Create(size, binding);
             case RendererAPI::RenderAPIType::None:
                 return nullptr;
         }
