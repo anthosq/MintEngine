@@ -142,8 +142,11 @@ namespace Mint {
     }
 
     void OpenGLShader::Reflect() {
+        // 后续改进为字符串解析来进行反射?
+        
         if (m_renderer_id ==0) return;
 
+        m_resources.clear();
         m_uniforms.clear();
 
         unsigned int numUniforms = 0;
@@ -155,6 +158,7 @@ namespace Mint {
         
         std::vector<char> nameBuffer(maxNameLength);
 
+        uint32_t texture_slot_index = 0;
         uint32_t offset = 0;
 
         LOG_INFO(fmt::format("Shader '{0}' Reflection:", m_name));
@@ -165,6 +169,24 @@ namespace Mint {
 
             glGetActiveUniform(m_renderer_id, i, maxNameLength, &nameLength, &size, &type, nameBuffer.data());
             std::string uniformName(nameBuffer.data(), nameLength);
+            // —————————————— WIP ————————————————————
+            if (type == GL_SAMPLER_2D || type == GL_SAMPLER_CUBE) {
+                int location = glGetUniformLocation(m_renderer_id, uniformName.c_str());
+
+                // 0对应set的接口, 后续启用spir-v时再使用
+                ShaderResourceInfo resourceInfo(uniformName, 0, texture_slot_index, 1);
+                m_resources[uniformName] = resourceInfo;
+
+                if (location != -1) {
+                    glUseProgram(m_renderer_id);
+                    glUniform1i(location, texture_slot_index);
+                }
+
+                LOG_INFO(fmt::format("  Name: {0}, Type: Sampler, Slot: {1} [Texture]", 
+                    uniformName, texture_slot_index));
+                texture_slot_index++;
+                continue;
+            }
 
             ShaderUniformType uniformType = Utils::GLTypeToShaderUniformType(type);
             uint32_t uniformSize = Utils::GetShaderUniformSize(uniformType);

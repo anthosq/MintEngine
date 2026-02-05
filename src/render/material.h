@@ -69,27 +69,27 @@ namespace Mint {
         // 我不认为这里应该传递引用, 如果使用Setter的设计模式
         // 但是考虑到配合ImGui, 这里先设计为传递引用, 这一点之后需要注意
         // Scalar
-        virtual float& GetFloat(const std::string& name) const = 0;
-        virtual int& GetInt(const std::string& name) const = 0;
-        virtual uint32_t& GetUInt(const std::string& name) const = 0;
-        virtual bool& GetBool(const std::string& name) const = 0;
+        virtual float& GetFloat(const std::string& name) = 0;
+        virtual int& GetInt(const std::string& name) = 0;
+        virtual uint32_t& GetUInt(const std::string& name) = 0;
+        virtual bool& GetBool(const std::string& name) = 0;
 
         // Vector
-        virtual glm::vec2& GetVec2(const std::string& name) const = 0;
-        virtual glm::vec3& GetVec3(const std::string& name) const = 0;
-        virtual glm::vec4& GetVec4(const std::string& name) const = 0;
+        virtual glm::vec2& GetVec2(const std::string& name) = 0;
+        virtual glm::vec3& GetVec3(const std::string& name) = 0;
+        virtual glm::vec4& GetVec4(const std::string& name) = 0;
 
-        virtual glm::ivec2& GetIVec2(const std::string& name) const = 0;
-        virtual glm::ivec3& GetIVec3(const std::string& name) const = 0;
-        virtual glm::ivec4& GetIVec4(const std::string& name) const = 0;
+        virtual glm::ivec2& GetIVec2(const std::string& name) = 0;
+        virtual glm::ivec3& GetIVec3(const std::string& name) = 0;
+        virtual glm::ivec4& GetIVec4(const std::string& name) = 0;
 
         // Matrix
-        virtual glm::mat3& GetMat3(const std::string& name) const = 0;
-        virtual glm::mat4& GetMat4(const std::string& name) const = 0;
+        virtual glm::mat3& GetMat3(const std::string& name) = 0;
+        virtual glm::mat4& GetMat4(const std::string& name) = 0;
 
         // Texture
-        virtual Ref<Texture2D>& GetTexture2D(const std::string& name) const = 0;
-        virtual Ref<TextureCube>& GetTextureCube(const std::string& name) const = 0;
+        virtual Ref<Texture2D> GetTexture2D(const std::string& name) = 0;
+        virtual Ref<TextureCube> GetTextureCube(const std::string& name) = 0;
 
     };
 }

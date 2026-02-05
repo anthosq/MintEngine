@@ -34,6 +34,7 @@ namespace Mint {
         // 反射相关
         void Reflect() override;
         const std::unordered_map<std::string, ShaderUniform>& GetUniforms() const override { return m_uniforms; };
+        virtual const std::unordered_map<std::string, ShaderResourceInfo>& GetResources() const override { return m_resources; };
 
     private:
         void UploadUniformInt(const std::string& name, int value);
@@ -58,6 +59,7 @@ namespace Mint {
         uint32_t m_renderer_id;
 
         std::unordered_map<std::string, ShaderUniform> m_uniforms;
+        std::unordered_map<std::string, ShaderResourceInfo> m_resources;
     };
 
 }

@@ -20,10 +20,10 @@ namespace Mint {
             ShaderUniform() = default;
             ShaderUniform(std::string name, ShaderUniformType type, uint32_t size, uint32_t offset);
 
-            const std::string& GetName() { return m_name; }
-            ShaderUniformType GetType() { return m_type; }
-            uint32_t GetSize() { return m_size; }
-            uint32_t GetOffset() { return m_offset; }
+            const std::string& GetName() const { return m_name; }
+            ShaderUniformType GetType() const { return m_type; }
+            uint32_t GetSize() const { return m_size; }
+            uint32_t GetOffset() const { return m_offset; }
 
             // 不确定这个是否该在这个类下
             static std::string_view UniformTypeToString(ShaderUniformType type);
@@ -42,13 +42,30 @@ namespace Mint {
     class ShaderBuffer {
         public:
         // TODO: 序列化与反序列化？
-
             std::string m_name;
             uint32_t m_size;
             std::unordered_map<std::string, ShaderUniform> m_uniforms;
     };
 
+    class ShaderResourceInfo {
+    public:
+        ShaderResourceInfo() = default;
+        ShaderResourceInfo(const std::string& name, uint32_t set, uint32_t binding_point, uint32_t size)
+            : m_name(name), m_set(set), m_binding_point(binding_point), m_size(size) {}
+        const std::string& GetName() const { return m_name; }
+        // uint32_t GetSet() const { return m_set; }
+        uint32_t GetBindingPoint() const { return m_binding_point; }
+        uint32_t GetSize() const { return m_size; }
 
+    private:
+        std::string m_name;
+        // not sure
+        // Shader: Set X, Binding Y, Name, Size
+        // 留下set接口, 后续更改使用Spir-V时启用
+        uint32_t m_set = 0;
+        uint32_t m_binding_point = 0;
+        uint32_t m_size = 0;
+    };
 
     class Shader : public RefCounter {
     public:
@@ -80,6 +97,7 @@ namespace Mint {
 
         virtual void Reflect() = 0;
         virtual const std::unordered_map<std::string, ShaderUniform>& GetUniforms() const = 0;
+        virtual const std::unordered_map<std::string, ShaderResourceInfo>& GetResources() const = 0;
     };
     
     // finnaly handled by ASSET system

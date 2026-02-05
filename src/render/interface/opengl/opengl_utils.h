@@ -18,6 +18,7 @@ namespace Mint {
             return 0;
         }
 
+
         static GLenum TextureTarget(bool multisample) {
             return multisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
         }
@@ -125,6 +126,7 @@ namespace Mint {
             }
             return ;
         }
+
 
         static ShaderUniformType GLTypeToShaderUniformType(GLenum type) {
             switch (type) {
