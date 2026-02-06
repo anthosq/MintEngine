@@ -53,8 +53,8 @@ namespace Mint {
         // Scene
         Mint::Ref<Mint::Scene> m_active_scene;
 
-        // Test UBO
-        Mint::Ref<Mint::UniformBuffer> m_material_ubo;
+        // Test Material
+        Mint::Ref<Mint::Material> m_test_material;
         glm::vec4 test_color;
 
         // view port

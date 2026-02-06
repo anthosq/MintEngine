@@ -169,7 +169,6 @@ namespace Mint {
 
             glGetActiveUniform(m_renderer_id, i, maxNameLength, &nameLength, &size, &type, nameBuffer.data());
             std::string uniformName(nameBuffer.data(), nameLength);
-            // —————————————— WIP ————————————————————
             if (type == GL_SAMPLER_2D || type == GL_SAMPLER_CUBE) {
                 int location = glGetUniformLocation(m_renderer_id, uniformName.c_str());
 

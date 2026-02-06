@@ -13,6 +13,8 @@ namespace Mint {
 
         virtual void Invalidate() override;
         virtual void OnShaderReload() override;
+        virtual void Bind() override;
+
 
         virtual void SetFlags(uint32_t flags) override;
         virtual void SetFlag(MaterialFlag flag, bool value = true) override;
@@ -41,7 +43,7 @@ namespace Mint {
         virtual uint32_t GetFlags() const override { return m_MaterialFlags; }
         virtual bool GetFlag(MaterialFlag flag) const override { return (uint32_t)flag & m_MaterialFlags; }
 
-        virtual Ref<Shader> GetShader() const override { return m_Shader; }
+        virtual Ref<Shader> GetShader() override { return m_Shader; }
         virtual const std::string& GetName() const override { return m_Name; }
 
         virtual float& GetFloat(const std::string& name) override;
@@ -99,7 +101,6 @@ namespace Mint {
         Buffer m_UniformBufferData;
         Ref<UniformBuffer> m_UniformBuffer;
 
-        std::vector<Ref<Texture>> m_Textures;
-        std::unordered_map<uint32_t, Ref<Texture2D>> m_Texture2DSlots;
+        std::unordered_map<uint32_t, Ref<Texture>> m_BoundTextures;
     };
 }

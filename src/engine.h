@@ -24,6 +24,7 @@
 #include "render/texture.h"
 #include "render/framebuffer.h"
 #include "render/uniform_buffer.h"
+#include "render/material.h"
 
 // Scene
 #include "scene/scene.h"

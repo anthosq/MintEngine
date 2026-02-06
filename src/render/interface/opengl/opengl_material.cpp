@@ -11,9 +11,40 @@ namespace Mint {
             m_MaterialFlags |= (uint32_t)MaterialFlag::Blend;
     }
 
-    OpenGLMaterial::OpenGLMaterial(Ref<Material>& other, const std::string& name) {
+    OpenGLMaterial::OpenGLMaterial(Ref<Material>& other, const std::string& name) : m_Name(name) {
+        Ref<OpenGLMaterial> glOther = other.As<OpenGLMaterial>();
+        if (glOther) {
+            m_Shader = glOther->m_Shader;
+            m_MaterialFlags = glOther->m_MaterialFlags;
+            
+            if (glOther->m_UniformBufferData.Data) {
+                m_UniformBufferData = Buffer::Copy(glOther->m_UniformBufferData.Data, glOther->m_UniformBufferData.Size);
+            }
 
+            AllocateStorage();
+
+            m_BoundTextures = glOther->m_BoundTextures;
+        }
     }
+
+    void OpenGLMaterial::AllocateStorage() {
+        const auto& shaderUniforms = m_Shader->GetUniforms();
+        if (shaderUniforms.size() > 0) {
+            uint32_t size = 0;
+            for (auto & [name, uniform] : shaderUniforms) {
+                if (uniform.GetOffset() != -1) { 
+                    size = std::max(size, uniform.GetOffset() + uniform.GetSize());
+                }
+            }
+            m_UniformBufferData.Allocate(size);
+            m_UniformBufferData.ZeroInitialize();
+
+            if (size > 0) {
+                m_UniformBuffer = UniformBuffer::Create(size, 0);
+            }
+        }
+    }
+
 
     OpenGLMaterial::~OpenGLMaterial() {
 
@@ -82,7 +113,7 @@ namespace Mint {
             return;
         }
         uint32_t slot = decl->GetBindingPoint();
-        m_Texture2DSlots[slot] = texture;
+        m_BoundTextures[slot] = texture;
     }
 
     void OpenGLMaterial::Set(const std::string &name, const Ref<Texture2D> &texture, uint32_t arrayIndex) {
@@ -92,7 +123,7 @@ namespace Mint {
             return;
         }
         uint32_t slot = decl->GetBindingPoint() + arrayIndex;
-        m_Texture2DSlots[slot] = texture;
+        m_BoundTextures[slot] = texture;
     }
 
     void OpenGLMaterial::Set(const std::string &name, const Ref<TextureCube> &texture) {
@@ -103,9 +134,9 @@ namespace Mint {
             return;
         }
         uint32_t slot = decl->GetBindingPoint();
-        if (m_Textures.size() <= slot)
-            m_Textures.resize((size_t)slot + 1);
-        m_Textures[slot] = texture;
+        // if (m_BoundTextures.size() <= slot)
+        //     m_BoundTextures.resize((size_t)slot + 1);
+        m_BoundTextures[slot] = texture;
     }
 
     void OpenGLMaterial::SetFlags(uint32_t flags) {}
@@ -151,6 +182,8 @@ namespace Mint {
         return Get<glm::mat4>(name);
     }
 
+    // TODO: Texture相关的实现还有问题, 应该实现一个基类Texture的模板
+
     Ref<Texture2D> OpenGLMaterial::GetTexture2D(const std::string &name) {
         auto decl = FindResourceInfo(name);
         if (!decl) {
@@ -160,9 +193,9 @@ namespace Mint {
         }
         uint32_t slot = decl->GetBindingPoint();
         // Not sure
-        auto it = m_Texture2DSlots.find(slot);
-        if (it != m_Texture2DSlots.end()) {
-            return m_Texture2DSlots[slot];
+        auto it = m_BoundTextures.find(slot);
+        if (it != m_BoundTextures.end()) {
+            return m_BoundTextures[slot];
         } 
         // later use assert 来替换这里的分支判断
         else {
@@ -174,12 +207,11 @@ namespace Mint {
     Ref<TextureCube> OpenGLMaterial::GetTextureCube(const std::string &name) {
         auto decl = FindResourceInfo(name);
         uint32_t slot = decl->GetBindingPoint();
-        if (slot < m_Textures.size()) {
+        if (slot < m_BoundTextures.size()) {
             LOG_ERROR(fmt::format("TextureCube resource not found: {0}", name));
         }
-        return m_Textures[slot];
+        return m_BoundTextures[slot];
     }
-
 
     const ShaderUniform* OpenGLMaterial::FindUniformDeclaration(const std::string &name) const {
         const auto& uniforms = m_Shader->GetUniforms();
@@ -191,5 +223,26 @@ namespace Mint {
         auto& resources = m_Shader->GetResources();
         auto it = resources.find(name);
         return it != resources.end() ? &it->second : nullptr;
+    }
+
+    void OpenGLMaterial::Bind() {
+        if (!m_Shader) {
+            LOG_WARN("OpenGLMaterial::Bind: Shader is null");
+            return;
+        }
+
+        m_Shader->Bind();
+        // !!TODO: Use Dirty Flag later
+
+        if (m_UniformBuffer) {
+            m_UniformBuffer->SetData(m_UniformBufferData.Data, m_UniformBufferData.Size, 0);
+        }
+
+        // Texture
+        for (auto && [slot, texture] : m_BoundTextures) {
+            if (texture) {
+                texture->Bind(slot);
+            }
+        }
     }
 }

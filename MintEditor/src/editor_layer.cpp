@@ -189,6 +189,11 @@ void EditorLayer::SetupShaders() {
     m_plane_shader = Mint::Shader::Create("sandbox/assets/shaders/test_shader.glsl");
     m_shader_library.Load("sandbox/assets/shaders/test_texture.glsl");
     m_shader_library.Load("sandbox/assets/shaders/cube_shader.glsl");
+
+    auto texture_shader = m_shader_library.Get("test_texture");
+    m_test_material = Mint::Material::Create(texture_shader, "TestMaterial");
+    test_color = glm::vec4(0.2f, 0.3f, 0.8f, 1.0f);
+    m_test_material->Set("u_Color", test_color);
 }
 
 void EditorLayer::SetupBuffers() {
@@ -208,8 +213,8 @@ void EditorLayer::SetupBuffers() {
     // m_cube_vao->SetIndexBuffer(cube_ibo);
 
     // Test UBO
-    test_color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-    m_material_ubo = Mint::UniformBuffer::Create(sizeof(test_color), 0);
+    // test_color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    // m_material_ubo = Mint::UniformBuffer::Create(sizeof(test_color), 0);
 
     // Test plane
     m_plane_vao = Mint::VertexArray::Create();
@@ -244,6 +249,7 @@ void EditorLayer::SetupTextures() {
     // m_skybox_texture = Mint::TextureCube::Create("sandbox/assets/pics/Arches_E_PineTree_Radiance.tga");
     // m_skybox_irradiance_texture = Mint::TextureCube::Create("sandbox/assets/pics/Arches_E_PineTree_Irradiance.tga");
 
+    // test material
 }
 // void SetupFramebuffers()
 
@@ -286,17 +292,26 @@ void EditorLayer::OnRender(Mint::TimeStep delta_time) {
 
     // test material
 
-    m_material_ubo->SetData(&test_color, sizeof(test_color), 0);
+    // m_material_ubo->SetData(&test_color, sizeof(test_color), 0);
 
     // render plane
     glm::mat4 transform = glm::translate(glm::mat4(1.0f), rectangle_transform);
     glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5f, 1.5f, 1.5f));
     transform = transform * scale;
 
-    m_plane_texture->Bind();
+    // m_plane_texture->Bind();
     auto m_texture_shader = m_shader_library.Get("test_texture");
-    m_texture_shader->SetInt("u_Texture", 0); // Texture unit 0
-    Mint::g_runtime_global_context.m_render_system->Submit(m_texture_shader, m_plane_vao, transform);
+    // m_texture_shader->SetInt("u_Texture", 0); // Texture unit 0
+    // Mint::g_runtime_global_context.m_render_system->Submit(m_texture_shader, m_plane_vao, transform);
+
+    // test material (plane)
+    Mint::RenderSystem::Submit([this] {
+        m_test_material->Set("u_Texture", m_plane_texture);
+        m_test_material->Bind();
+    });
+    auto material_shader = m_test_material->GetShader();
+    Mint::g_runtime_global_context.m_render_system->Submit(material_shader, m_plane_vao, transform);
+
 
     m_transparent_texture->Bind();
     m_texture_shader->SetInt("u_Texture", 0); // Texture unit 0

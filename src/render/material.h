@@ -26,7 +26,7 @@ namespace Mint {
 
         virtual void Invalidate() = 0;
         virtual void OnShaderReload() = 0;
-
+        virtual void Bind() = 0;
 
         // Set Method
         virtual void SetFlags(uint32_t flags) = 0;
@@ -63,7 +63,7 @@ namespace Mint {
         virtual uint32_t GetFlags() const = 0;
         virtual bool GetFlag(MaterialFlag flag) const = 0;
 
-        virtual Ref<Shader> GetShader() const = 0;
+        virtual Ref<Shader> GetShader() = 0;
         virtual const std::string& GetName() const = 0;
 
         // 我不认为这里应该传递引用, 如果使用Setter的设计模式
