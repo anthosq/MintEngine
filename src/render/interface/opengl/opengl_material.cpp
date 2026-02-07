@@ -113,7 +113,9 @@ namespace Mint {
             return;
         }
         uint32_t slot = decl->GetBindingPoint();
+        // LOG_INFO(fmt::format("Texture2D set for resource: {0} at slot: {1}", name, slot));
         m_BoundTextures[slot] = texture;
+        // LOG_INFO(fmt::format("Material::Set texture - BoundTextures size now: {}", m_BoundTextures.size()));
     }
 
     void OpenGLMaterial::Set(const std::string &name, const Ref<Texture2D> &texture, uint32_t arrayIndex) {
@@ -230,6 +232,10 @@ namespace Mint {
             LOG_WARN("OpenGLMaterial::Bind: Shader is null");
             return;
         }
+        // LOG_INFO(fmt::format("Shader: {}", m_Shader ? m_Shader->GetName() : "NULL"));
+        // LOG_INFO(fmt::format("UniformBuffer: {}", m_UniformBuffer ? "EXISTS" : "NULL"));
+        // LOG_INFO(fmt::format("UniformBufferData.Size: {}", m_UniformBufferData.Size));
+        // LOG_INFO(fmt::format("BoundTextures.size: {}", m_BoundTextures.size()));
 
         m_Shader->Bind();
         // !!TODO: Use Dirty Flag later

@@ -190,10 +190,10 @@ void EditorLayer::SetupShaders() {
     m_shader_library.Load("sandbox/assets/shaders/test_texture.glsl");
     m_shader_library.Load("sandbox/assets/shaders/cube_shader.glsl");
 
+    Mint::g_runtime_global_context.m_render_system->WaitAndRender();
     auto texture_shader = m_shader_library.Get("test_texture");
     m_test_material = Mint::Material::Create(texture_shader, "TestMaterial");
     test_color = glm::vec4(0.2f, 0.3f, 0.8f, 1.0f);
-    m_test_material->Set("u_Color", test_color);
 }
 
 void EditorLayer::SetupBuffers() {
@@ -305,10 +305,10 @@ void EditorLayer::OnRender(Mint::TimeStep delta_time) {
     // Mint::g_runtime_global_context.m_render_system->Submit(m_texture_shader, m_plane_vao, transform);
 
     // test material (plane)
-    Mint::RenderSystem::Submit([this] {
-        m_test_material->Set("u_Texture", m_plane_texture);
-        m_test_material->Bind();
-    });
+
+    m_test_material->Set("u_Color", test_color);
+    m_test_material->Set("u_Texture", m_plane_texture);
+    m_test_material->Bind();
     auto material_shader = m_test_material->GetShader();
     Mint::g_runtime_global_context.m_render_system->Submit(material_shader, m_plane_vao, transform);
 
