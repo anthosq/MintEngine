@@ -92,4 +92,55 @@ namespace Mint {
         virtual Ref<TextureCube> GetTextureCube(const std::string& name) = 0;
 
     };
+
+
+    // 临时实现, 后续需要实现完整的AssetManager, 使用UUID存储相关内容
+    class MaterialTable : public RefCounter {
+    public:
+        explicit MaterialTable(uint32_t slotCount = 1)
+        : m_slotCount(slotCount) {}
+
+        ~MaterialTable() = default;
+
+        bool HasMaterial(uint32_t slot) const {
+            return slot < m_slotCount && m_materials[slot] != nullptr;
+        }
+
+        void SetMaterial(uint32_t slot, const Ref<Material>& material) {
+            if (slot < m_slotCount) {
+                m_materials[slot] = material;
+            }
+        }
+
+        Ref<Material> GetMaterial(uint32_t slot) const {
+            return slot < m_slotCount ? m_materials[slot] : nullptr;
+        }
+
+        uint32_t GetSlotCount() const {
+            return m_slotCount;
+        }
+
+        void SetSlotCount(uint32_t count) {
+            m_slotCount = count;
+            m_materials.resize(count);
+        }
+
+        // GetMaterials?
+        std::vector<Ref<Material>>& GetMaterials() {
+            return m_materials;
+        }
+        const std::vector<Ref<Material>>& GetMaterials() const {
+            return m_materials;
+        }
+
+    private:
+        uint32_t m_slotCount;
+        std::vector<Ref<Material>> m_materials;
+    };
+
+
+    // draft Material Asset
+    class MaterialAsset : public Asset {
+
+    };
 }

@@ -6,6 +6,8 @@
 #include "render/shader.h"
 #include "render/material.h"
 
+#include "math/AABB.h"
+
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <assimp/Importer.hpp>
@@ -54,6 +56,12 @@ namespace Mint {
 
     static_assert(sizeof(Index) == 3 * sizeof(uint32_t));
 
+    struct Triangle {
+        Vertex v0, v1, v2;
+
+        Triangle(const Vertex& a, const Vertex& b, const Vertex& c)
+            : v0(a), v1(b), v2(c) {}
+    };
 
     // later need to consider serialization & MeshFactory
     struct BoneInfo {
@@ -92,7 +100,14 @@ namespace Mint {
         uint32_t IndexCount;
         // uint32_t VertexCount;
 
-        glm::mat4 Transform;
+        glm::mat4 Transform { 1.0f };
+        glm::mat4 LocalTransform { 1.0f };
+        AABB BoundingBox;
+
+        // Debuging, need to add 
+        std::string name;
+        // 暂时先不考虑Bone的实现, 优先确保Mesh导入完善
+        // 完善Mesh导入后为Renderer添加SubmitMesh方法
     };
 
     // TODO: support animated skeletons and MeshFactory
@@ -100,7 +115,6 @@ namespace Mint {
     // 参照UE
     // MeshResource作为Resource, Submesh作为渲染atomic unit, Mesh与StaticMesh作为Instance
     // 维护MaterialTable管理材质槽位, MaterialAsset作为资源存在
-    // 注意, 需要先完成Material的设计, 然后重构Shader关于Uniform部分的内容, 再回来设计Mesh
 
     class Mesh : public Asset
     {
@@ -113,9 +127,12 @@ namespace Mint {
         void OnImGuiRender();
         void DumpVertexBuffer();
 
-        Ref<Shader> GetShader() const { return m_mesh_shader; }
+        Ref<Shader> GetMeshShader() const { return m_mesh_shader; }
         Ref<Material> GetMaterial() const { return m_material; }
         inline const std::filesystem::path &GetFilePath() const { return m_filepath; }
+
+    private:
+        void TraverseNode(aiNode* node);
 
     private:
         std::vector<SubMesh> m_submeshes;
