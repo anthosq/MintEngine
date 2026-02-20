@@ -1,6 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
-#include "asset.h"
+#include "asset/asset.h"
 #include "render/buffer.h"
 #include "core/time_step.h"
 #include "render/shader.h"
@@ -8,11 +8,7 @@
 
 #include "math/AABB.h"
 
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-#include <assimp/Importer.hpp>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/LogStream.hpp>
+
 
 namespace Mint {
     // temporary mesh class
@@ -98,55 +94,165 @@ namespace Mint {
         uint32_t BaseIndex;
         uint32_t MaterialIndex;
         uint32_t IndexCount;
-        // uint32_t VertexCount;
+        uint32_t VertexCount;
 
         glm::mat4 Transform { 1.0f };
         glm::mat4 LocalTransform { 1.0f };
         AABB BoundingBox;
 
         // Debuging, need to add 
-        std::string name;
+        std::string MeshName, NodeName;
         // 暂时先不考虑Bone的实现, 优先确保Mesh导入完善
         // 完善Mesh导入后为Renderer添加SubmitMesh方法
     };
 
     // TODO: support animated skeletons and MeshFactory
     // TODO: 分离出Resource与Instance
-    // 参照UE
     // MeshResource作为Resource, Submesh作为渲染atomic unit, Mesh与StaticMesh作为Instance
     // 维护MaterialTable管理材质槽位, MaterialAsset作为资源存在
 
-    class Mesh : public Asset
-    {
-    public:
-        Mesh(const std::filesystem::path &filepath);
-        ~Mesh();
+    class MeshNode {
+        uint32_t Parent = 0xffffffff;
+        std::vector<uint32_t> Children;
+        std::vector<uint32_t> SubMeshes;
 
-        // not sure
-        void OnUpdate(TimeStep ts);
-        void OnImGuiRender();
+        std::string Name;
+        glm::mat4 localTransform;
+
+        bool IsRoot() const { return Parent == 0xffffffff; }
+
+    };
+
+    class MeshSource : public Asset {
+    public:
+        MeshSource() = default;
+        MeshSource(const std::vector<Vertex>& vertices, const std::vector<Index>& indices, const glm::mat4& transform);
+        // Not sure
+        MeshSource(const std::vector<Vertex>& vertices, const std::vector<Index>& indices, const std::vector<SubMesh>& submeshes);
+        virtual ~MeshSource();
+
         void DumpVertexBuffer();
 
-        Ref<Shader> GetMeshShader() const { return m_mesh_shader; }
-        Ref<Material> GetMaterial() const { return m_material; }
+        // MeshSource作为资源类, 以Get Set 为主要Methods
+        std::vector<SubMesh>& GetSubMeshes() { return m_submeshes; }
+        const std::vector<SubMesh>& GetSubMeshes() const { return m_submeshes; }
+
+        const std::vector<Vertex>& GetVertices() const { return m_vertices; }
+        const std::vector<Index>& GetIndices() const { return m_indices; }
+
+        // skeleton?
+        // bool HasSkeleton() const { return (bool)m_skeleton; }
+        // bool IsSubmeshRigged(uint32_t submeshIndex) const { return m_submeshes[submeshIndex].IsRigged(); }
+        // const Skeleton* GetSkeleton() const { return m_skeleton.get(); }
+        // const glm::mat4& GetSkeletonTransform() const { return m_skeleton_transform; }
+        // bool IsCompatibleSkeleton(const std::string_view animation_name, const Skeleton& skeleton) const {}
+
+        // Animation?
+        // std::vector<std::string> GetAnimationNames() const {}
+        // const Animation* GetAnimation(const std::string_view animation_name, const Skeleton& skeleton, ...) const {}
+        // const std::vector<BoneInfluence>& GetBoneInfluences() const { return m_bone_influences; }
+
+
+        std::vector<AssetHandle>& GetMaterial() { return m_materials; }
+        const std::vector<AssetHandle>& GetMaterial() const { return m_materials; }
+
         inline const std::filesystem::path &GetFilePath() const { return m_filepath; }
 
-    private:
-        void TraverseNode(aiNode* node);
+        Ref<VertexBuffer> GetVertexBuffer() { return m_vertex_buffer; }
+        Ref<IndexBuffer> GetIndexBuffer() { return m_index_buffer; }
+
+        const AABB& GetBoundingBox() const { return m_bounding_box; }
+
+        const std::vector<Triangle> GetTrianglesCache(uint32_t submesh_index) {return m_triangle_cache.at(submesh_index); }
+
+        const std::vector<MeshNode>& GetMeshNodes() const { return m_nodes; }
+        const MeshNode& GetRootNode() const { return m_nodes[0]; }
 
     private:
         std::vector<SubMesh> m_submeshes;
-        std::unique_ptr<Assimp::Importer> m_importer;
+        // std::unique_ptr<Assimp::Importer> m_importer;
 
-        glm::mat4 m_inverse_transform;
+        Ref<VertexBuffer> m_vertex_buffer;
+        Ref<IndexBuffer> m_index_buffer;
 
         std::vector<Vertex> m_vertices;
         std::vector<Index> m_indices;
-        const aiScene* m_scene;
 
-        Ref<Shader> m_mesh_shader;
-        Ref<Material> m_material;
+        // Ref<VertexBuffer> m_bone_influence_Buffer;
+        // std::vector<BoneInfluence> m_bone_influence;
+        // std::vector<BoneInfo> m_bone_info;
+
+        // skeleton?
+        // Scope<Skeleton> m_skeleton;
+        // glm::mat4 m_skeleton_transform;
+        
+        // animation?
+        // std::vector<std::string> m_animation_names;
+        // std::unordered_map<std::string, Scope<Animation>> m_animations;
+
+        // Using UUID?
+        std::vector<AssetHandle> m_materials;
+
+        // AABB
+        AABB m_bounding_box;
 
         std::filesystem::path m_filepath;
+        
+        std::unordered_map<uint32_t, std::vector<Triangle>> m_triangle_cache;
+        // Nodes?
+        std::vector<MeshNode> m_nodes;
+    };
+
+    class Mesh : public Asset {
+    public:
+        explicit Mesh(AssetHandle mesh_source);
+        Mesh(AssetHandle mesh_source, const std::vector<uint32_t>& submeshes);
+        virtual ~Mesh() = default;
+
+
+        // pass in empty vector to set All submeshes for MeshSource
+        void SetSubmeshes(const std::vector<uint32_t>& submeshes, Ref<MeshSource> mesh_source);
+        const std::vector<uint32_t>& GetSubmeshes() const { return m_submeshes; }
+
+        void SetMeshSource(AssetHandle mesh_source) { m_mesh_source = mesh_source; }
+        AssetHandle GetMeshSource() const { return m_mesh_source; }
+
+        Ref<MaterialTable> GetMaterialTable() const { return m_material_table; }
+
+        // const Skeleton* GetSkeleton() const;
+        // leave for Asset
+
+    private:
+        AssetHandle m_mesh_source;
+        std::vector<uint32_t> m_submeshes;
+        Ref<MaterialTable> m_material_table;
+
+        // bool generate_colliders = false;
+
+    };
+
+
+    // StaticMesh 
+    class StaticMesh : public Asset{
+    public:
+        explicit StaticMesh(AssetHandle mesh_source);
+        StaticMesh(AssetHandle mesh_source, const std::vector<uint32_t>& submeshes);
+        virtual ~StaticMesh() = default;
+
+
+        // pass in empty vector to set All submeshes for MeshSource
+        void SetSubmeshes(const std::vector<uint32_t>& submeshes, Ref<MeshSource> mesh_source);
+        const std::vector<uint32_t>& GetSubmeshes() const { return m_submeshes; }
+
+        void SetMeshSource(AssetHandle mesh_source) { m_mesh_source = mesh_source; }
+        AssetHandle GetMeshSource() const { return m_mesh_source; }
+
+        Ref<MaterialTable> GetMaterialTable() const { return m_material_table; }
+
+    private:
+        AssetHandle m_mesh_source;
+        std::vector<uint32_t> m_submeshes;
+        Ref<MaterialTable> m_material_table;
+
     };
 }

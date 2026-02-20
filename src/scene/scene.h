@@ -1,6 +1,6 @@
 #pragma once
 #include <entt/entt.hpp>
-#include "asset.h"
+#include "asset/asset.h"
 #include "uuid.h"
 #include "core/time_step.h"
 

@@ -1,9 +1,11 @@
 #pragma once
 
 #include "Core/ref.h"
+#include "asset/asset.h"
 #include "render/shader.h"
 #include "render/texture.h"
 #include <string>
+#include <map>
 
 namespace Mint {
 
@@ -103,17 +105,25 @@ namespace Mint {
         ~MaterialTable() = default;
 
         bool HasMaterial(uint32_t slot) const {
-            return slot < m_slotCount && m_materials[slot] != nullptr;
+            return m_materials.find(slot) != m_materials.end();
         }
 
-        void SetMaterial(uint32_t slot, const Ref<Material>& material) {
-            if (slot < m_slotCount) {
-                m_materials[slot] = material;
+        void SetMaterial(uint32_t slot, AssetHandle materialHandle) {
+            m_materials[slot] = materialHandle;
+            if (slot >= m_slotCount) {
+                m_slotCount = slot + 1;
             }
         }
 
+        // 临时实现, 方便渲染器使用
         Ref<Material> GetMaterial(uint32_t slot) const {
-            return slot < m_slotCount ? m_materials[slot] : nullptr;
+            // TODO: 补充Verify宏
+            return AssetManager::GetAsset<Material>(m_materials.at(slot));
+        }
+
+        AssetHandle GetMaterialHandle(uint32_t slot) const {
+            // TODO: 补充Verify宏
+            return m_materials.at(slot);
         }
 
         uint32_t GetSlotCount() const {
@@ -122,20 +132,30 @@ namespace Mint {
 
         void SetSlotCount(uint32_t count) {
             m_slotCount = count;
-            m_materials.resize(count);
         }
 
         // GetMaterials?
-        std::vector<Ref<Material>>& GetMaterials() {
+        std::map<uint32_t, AssetHandle>& GetMaterials() {
             return m_materials;
         }
-        const std::vector<Ref<Material>>& GetMaterials() const {
+        const std::map<uint32_t, AssetHandle>& GetMaterials() const {
             return m_materials;
+        }
+
+        void ClearMaterial(uint32_t slot) {
+            m_materials.erase(slot);
+            if (slot >= m_slotCount) {
+                m_slotCount = slot + 1;
+            }
+        }
+
+        void Clear() {
+            m_materials.clear();
         }
 
     private:
         uint32_t m_slotCount;
-        std::vector<Ref<Material>> m_materials;
+        std::map<uint32_t, AssetHandle> m_materials;
     };
 
 
