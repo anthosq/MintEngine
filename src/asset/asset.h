@@ -11,9 +11,17 @@ namespace Mint {
         AssetHandle Handle = 0;
         Asset() = default;
         virtual ~Asset() = default;
+
+        virtual bool operator==(const Asset& other) const {
+            return Handle == other.Handle;
+        }
+
+        virtual bool operator!=(const Asset& other) const {
+            return !(*this == other);
+        }
+
     };
 
-    std::unordered_map<AssetHandle, Ref<Asset>> s_loaded_assets;
     // 临时的AssetManager 作为单例管理所有资源
     class AssetManager {
     public:
@@ -24,9 +32,9 @@ namespace Mint {
             return asset ? asset.As<T>() : nullptr;
         }
 
-        static AssetHandle AddMemoryOnlyAsset(const Ref<Asset>& asset) {
+        static AssetHandle AddMemoryOnlyAsset(Ref<Asset>& asset) {
             if (asset->Handle == 0) {
-                asset->Handle = UUID();
+                asset->Handle = AssetHandle();
             }
             s_loaded_assets[asset->Handle] = asset;
             return asset->Handle;

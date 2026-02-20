@@ -125,7 +125,7 @@ namespace Mint {
             virtual void SetData(const void* data, uint32_t size) = 0;
 
             static Ref<VertexBuffer> Create(uint32_t size);
-            static Ref<VertexBuffer> Create(float* vertices, uint32_t size);
+            static Ref<VertexBuffer> Create(void* vertices, uint32_t size);
     };
 
 
@@ -138,7 +138,7 @@ namespace Mint {
             virtual uint32_t GetCount() const = 0;
             virtual void SetData(const void* data, uint32_t size) = 0;
 
-            static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t size);
+            static Ref<IndexBuffer> Create(void* indices, uint32_t size);
     };
     
 }

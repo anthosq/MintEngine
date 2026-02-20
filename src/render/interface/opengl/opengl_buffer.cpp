@@ -14,7 +14,7 @@ namespace Mint {
     });
     }
 
-    OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32_t size) : m_size(size) {
+    OpenGLVertexBuffer::OpenGLVertexBuffer(void* vertices, uint32_t size) : m_size(size) {
         m_local_data = Buffer::Copy((byte*)vertices, size);
         RenderSystem::Submit([=] () {
             glCreateBuffers(1, &m_renderer_id);
@@ -52,7 +52,7 @@ namespace Mint {
     }
 
     // IndexBuffer
-    OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t *indices, uint32_t size) : m_size(size) {
+    OpenGLIndexBuffer::OpenGLIndexBuffer(void* indices, uint32_t size) : m_size(size) {
         m_local_data = Buffer::Copy((byte*)indices, size);
         // 临时
         m_count = size / sizeof(uint32_t);

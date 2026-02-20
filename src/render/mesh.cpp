@@ -1,5 +1,5 @@
 #include "render/mesh.h"
-
+#include "render/buffer.h"
 
 #include "log_system.h"
 #include "render/interface/opengl/gl_common.h"
@@ -8,7 +8,7 @@ namespace Mint {
     MeshSource::MeshSource(const std::vector<Vertex>& vertices, const std::vector<Index>& indices, const glm::mat4& transform)
         : m_vertices(vertices), m_indices(indices) {
         Handle = {};
-        Submesh &submesh = m_submeshes.emplace_back();
+        SubMesh& submesh = m_submeshes.emplace_back();
         submesh.BaseVertex = 0;
         submesh.BaseIndex = 0;
         submesh.VertexCount = static_cast<uint32_t>(vertices.size());
@@ -75,7 +75,7 @@ namespace Mint {
         if (!submeshes.empty()) {
             m_submeshes = submeshes;
         } else {
-            const auto& submeshes = mesh_source->GetSubmeshes();
+            const auto& submeshes = mesh_source->GetSubMeshes();
             m_submeshes.resize(submeshes.size());
             for (uint32_t i = 0; i < submeshes.size(); i++) {
                 m_submeshes[i] = i;
@@ -154,7 +154,7 @@ namespace Mint {
         if (!submeshes.empty()) {
             m_submeshes = submeshes;
         } else {
-            const auto& submeshes = mesh_source->GetSubmeshes();
+            const auto& submeshes = mesh_source->GetSubMeshes();
             m_submeshes.resize(submeshes.size());
             for (uint32_t i = 0; i < submeshes.size(); i++) {
                 m_submeshes[i] = i;

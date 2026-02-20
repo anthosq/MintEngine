@@ -8,7 +8,7 @@ namespace Mint {
     class OpenGLVertexBuffer : public VertexBuffer {
     public:
         OpenGLVertexBuffer(uint32_t size);
-        OpenGLVertexBuffer(float* vertices, uint32_t size);
+        OpenGLVertexBuffer(void* vertices, uint32_t size);
         virtual ~OpenGLVertexBuffer();
 
         virtual const BufferLayout& GetLayout() const override { return m_layout; }
@@ -30,7 +30,7 @@ namespace Mint {
 
     class OpenGLIndexBuffer : public IndexBuffer {
     public:
-        OpenGLIndexBuffer(uint32_t *indices, uint32_t count);
+        OpenGLIndexBuffer(void* indices, uint32_t count);
         virtual ~OpenGLIndexBuffer();
 
         void Bind() const;
