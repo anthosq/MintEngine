@@ -4,6 +4,13 @@
 
 namespace Mint {
     using AssetHandle = UUID;
+    enum class AssetFlag : uint16_t {
+        None = 0,
+        Missing = 1 << 0,
+        Invalid = 1 << 1
+    };
+
+
     class Asset : public RefCounter {
     // 临时接口, 后续实现Asset时完善
     // 目前先作为所有资源的基类存在
@@ -11,6 +18,7 @@ namespace Mint {
         AssetHandle Handle = 0;
         Asset() = default;
         virtual ~Asset() = default;
+        uint16_t Flags = (uint16_t)AssetFlag::None;
 
         virtual bool operator==(const Asset& other) const {
             return Handle == other.Handle;
@@ -18,6 +26,19 @@ namespace Mint {
 
         virtual bool operator!=(const Asset& other) const {
             return !(*this == other);
+        }
+
+    private:
+        friend class AssimpMeshImporter;
+
+        bool IsValid() const { return ((Flags & (uint16_t)AssetFlag::Missing) | (Flags & (uint16_t)AssetFlag::Invalid)) == 0; }
+        bool IsFlagSet(AssetFlag flag) const { return (Flags & (uint16_t)flag); }
+        void SetFlag(AssetFlag flag, bool value = true) {
+            if (value) {
+                Flags |= (uint16_t)flag;
+            } else {
+                Flags &= ~(uint16_t)flag;
+            }
         }
 
     };

@@ -95,6 +95,53 @@ namespace Mint {
 
     };
 
+    // wrapper类
+    class MaterialAsset : public Asset {
+    public:
+        explicit MaterialAsset(bool transparent = false);
+        explicit MaterialAsset(Ref<Material>& material);
+        ~MaterialAsset();
+
+        // virtual void OnDependencyUpdated(AssetHandle handle);
+        
+        // Get & Set
+        glm::vec3 GetAlbedoColor();
+        void SetAlbedoColor(const glm::vec3& color);
+
+        float& GetRoughness();
+        void SetRoughness(float roughness);
+
+        float& GetEmission();
+        void SetEmission(float emission);
+
+        // Get & Set of Texture
+        // Ref<Texture2D> GetAlbedoMap();
+        // // 考虑之后接受AssetHandle, 方便起见目前先接受texture?
+        // void SetAlbedoMap(const Ref<Texture2D>& texture);
+        // void ClearAlbedoMap();
+        // // Normal Metalness Roughness Transparency
+        // Ref<Texture2D> GetNormalMap();
+        // void SetNormalMap(const Ref<Texture2D>& texture);
+        // void ClearNormalMap();
+
+        // Ref<Texture2D> GetMetalnessMap();
+        // void SetMetalnessMap(const Ref<Texture2D>& texture);
+        // void ClearMetalnessMap();
+
+        // Ref<Texture2D> GetRoughnessMap();
+        // void SetRoughnessMap(const Ref<Texture2D>& texture);
+        // void ClearRoughnessMap();
+
+        // Ref<Texture2D> GetTransparencyMap();
+        // void SetTransparencyMap(const Ref<Texture2D>& texture);
+        // void ClearTransparencyMap();
+
+
+    private:
+        Ref<Material> m_Material;
+        bool m_Transparent = false; 
+    };
+
 
     // 临时实现, 后续需要实现完整的AssetManager, 使用UUID存储相关内容
     class MaterialTable : public RefCounter {
@@ -158,9 +205,4 @@ namespace Mint {
         std::map<uint32_t, AssetHandle> m_materials;
     };
 
-
-    // draft Material Asset
-    class MaterialAsset : public Asset {
-
-    };
 }
