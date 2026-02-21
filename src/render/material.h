@@ -111,6 +111,9 @@ namespace Mint {
         float& GetRoughness();
         void SetRoughness(float roughness);
 
+        float& GetMetalness();
+        void SetMetalness(float metalness);
+
         float& GetEmission();
         void SetEmission(float emission);
 

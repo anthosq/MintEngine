@@ -169,6 +169,8 @@ namespace Mint {
         const MeshNode& GetRootNode() const { return m_nodes[0]; }
 
     private:
+        friend class AssimpMeshImporter;
+
         std::vector<SubMesh> m_submeshes;
         // std::unique_ptr<Assimp::Importer> m_importer;
 

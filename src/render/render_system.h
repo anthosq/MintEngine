@@ -25,7 +25,7 @@ namespace Mint {
 
 		void Init();
 
-        const std::unique_ptr<ShaderLibrary>& GetShaderLibrary() { return Get_Renderer().m_shaderLibrary; }
+        static const std::unique_ptr<ShaderLibrary>& GetShaderLibrary() { return Get_Renderer().m_shaderLibrary; }
 
         template<typename FuncT>
         static void Submit(FuncT&& func) {

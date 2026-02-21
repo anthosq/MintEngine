@@ -67,7 +67,7 @@ namespace Mint {
         importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
         const aiScene* scene = importer.ReadFile(m_Path.string(), s_MeshImportFlags);
         if (!scene) {
-            LOG_ERROR(std::format("Failed to load mesh from path: {}, error: {}", m_Path.string(), importer.GetErrorString()));
+            LOG_ERROR(fmt::format("Failed to load mesh from path: {}, error: {}", m_Path.string(), importer.GetErrorString()));
             meshSource->SetFlag(AssetFlag::Invalid);
             return nullptr;
         }
@@ -78,27 +78,27 @@ namespace Mint {
             uint32_t vertexCount = 0;
 			uint32_t indexCount = 0;
 
-			meshSource->m_BoundingBox.Min = { FLT_MAX, FLT_MAX, FLT_MAX };
-			meshSource->m_BoundingBox.Max = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
+			meshSource->m_bounding_box.Min = { FLT_MAX, FLT_MAX, FLT_MAX };
+			meshSource->m_bounding_box.Max = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
 
-			meshSource->m_Submeshes.reserve(scene->mNumMeshes);
+			meshSource->m_submeshes.reserve(scene->mNumMeshes);
 			for (unsigned m = 0; m < scene->mNumMeshes; m++)
 			{
 				aiMesh* mesh = scene->mMeshes[m];
 
 				if (!mesh->HasPositions())
 				{
-					LOG_ERROR(std::format("Mesh index {0} with name '{1}' has no vertex positions - skipping import!", m, mesh->mName.C_Str()));
+					LOG_ERROR(fmt::format("Mesh index {0} with name '{1}' has no vertex positions - skipping import!", m, mesh->mName.C_Str()));
 				}
 				if (!mesh->HasNormals())
 				{
-					LOG_WARN(std::format("Mesh index {0} with name '{1}' has no vertex normals, and they could not be computed - skipping import!", m, mesh->mName.C_Str()));
+					LOG_WARN(fmt::format("Mesh index {0} with name '{1}' has no vertex normals, and they could not be computed - skipping import!", m, mesh->mName.C_Str()));
 				}
 
 				bool skip = !mesh->HasPositions() || !mesh->HasNormals();
 
 				// still have to create a placeholder submesh even if we are skipping it (otherwise TraverseNodes() does not work)
-				SubMesh& submesh = meshSource->m_Submeshes.emplace_back();
+				SubMesh& submesh = meshSource->m_submeshes.emplace_back();
 				submesh.BaseVertex = vertexCount;
 				submesh.BaseIndex = indexCount;
 				submesh.MaterialIndex = mesh->mMaterialIndex;
@@ -134,38 +134,37 @@ namespace Mint {
 					}
 
 					if (mesh->HasTextureCoords(0))
-						vertex.Texcoord = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
+						vertex.TexCoords = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
 
-					meshSource->m_Vertices.push_back(vertex);
+					meshSource->m_vertices.push_back(vertex);
 				}
 
 				// Indices
 				for (size_t i = 0; i < mesh->mNumFaces; i++)
 				{
 					// we're using aiProcess_Triangulate so this should always be true
-					HZ_CORE_ASSERT(mesh->mFaces[i].mNumIndices == 3, "Must have 3 indices.");
 					Index index = { mesh->mFaces[i].mIndices[0], mesh->mFaces[i].mIndices[1], mesh->mFaces[i].mIndices[2] };
-					meshSource->m_Indices.push_back(index);
+					meshSource->m_indices.push_back(index);
 
-					meshSource->m_TriangleCache[m].emplace_back(meshSource->m_Vertices[index.V1 + submesh.BaseVertex], meshSource->m_Vertices[index.V2 + submesh.BaseVertex], meshSource->m_Vertices[index.V3 + submesh.BaseVertex]);
+					meshSource->m_triangle_cache[m].emplace_back(meshSource->m_vertices[index.V1 + submesh.BaseVertex], meshSource->m_vertices[index.V2 + submesh.BaseVertex], meshSource->m_vertices[index.V3 + submesh.BaseVertex]);
 				}
 			}
             
-            MeshNode& rootNode = meshSource->m_Nodes.emplace_back();
+            MeshNode& rootNode = meshSource->m_nodes.emplace_back();
 			TraverseNodes(meshSource, scene->mRootNode, 0);
 
-			for (const auto& submesh : meshSource->m_Submeshes)
+			for (const auto& submesh : meshSource->m_submeshes)
 			{
 				AABB transformedSubmeshAABB = submesh.BoundingBox;
 				glm::vec3 min = glm::vec3(submesh.Transform * glm::vec4(transformedSubmeshAABB.Min, 1.0f));
 				glm::vec3 max = glm::vec3(submesh.Transform * glm::vec4(transformedSubmeshAABB.Max, 1.0f));
 
-				meshSource->m_BoundingBox.Min.x = glm::min(meshSource->m_BoundingBox.Min.x, min.x);
-				meshSource->m_BoundingBox.Min.y = glm::min(meshSource->m_BoundingBox.Min.y, min.y);
-				meshSource->m_BoundingBox.Min.z = glm::min(meshSource->m_BoundingBox.Min.z, min.z);
-				meshSource->m_BoundingBox.Max.x = glm::max(meshSource->m_BoundingBox.Max.x, max.x);
-				meshSource->m_BoundingBox.Max.y = glm::max(meshSource->m_BoundingBox.Max.y, max.y);
-				meshSource->m_BoundingBox.Max.z = glm::max(meshSource->m_BoundingBox.Max.z, max.z);
+				meshSource->m_bounding_box.Min.x = glm::min(meshSource->m_bounding_box.Min.x, min.x);
+				meshSource->m_bounding_box.Min.y = glm::min(meshSource->m_bounding_box.Min.y, min.y);
+				meshSource->m_bounding_box.Min.z = glm::min(meshSource->m_bounding_box.Min.z, min.z);
+				meshSource->m_bounding_box.Max.x = glm::max(meshSource->m_bounding_box.Max.x, max.x);
+				meshSource->m_bounding_box.Max.y = glm::max(meshSource->m_bounding_box.Max.y, max.y);
+				meshSource->m_bounding_box.Max.z = glm::max(meshSource->m_bounding_box.Max.z, max.z);
 			}
 		}
 
@@ -174,7 +173,7 @@ namespace Mint {
         // Materials
         // Ref<Texture2D> defaultTexture = RenderSystem::GetInstance().GetDefaultWhiteTexture();
 		if (scene->HasMaterials()) {
-			meshSource->m_Materials.reserve(scene->mNumMaterials);
+			meshSource->m_materials.reserve(scene->mNumMaterials);
 			for (uint32_t i = 0; i < scene->mNumMaterials; i++)
 			{
 				aiMaterial* aiMaterial = scene->mMaterials[i];
@@ -217,16 +216,13 @@ namespace Mint {
 				material_asset->SetRoughness(roughness);
 				material_asset->SetMetalness(metalness);
 
-				LOG_INFO(
-					"Loaded material: {0}, Albedo: {1}, {2}, {3}, Roughness: {4}, Metalness: {5}, Emission: {6}",
+				LOG_INFO(fmt::format("Loaded material: {0}, Albedo: {1}, {2}, {3}, Roughness: {4}, Metalness: {5}, Emission: {6}",
 					aiMaterialName.data, aiColor.r, aiColor.g, aiColor.b, roughness, metalness, emission
-				);
+				));
 
 
 			}
 		}
-
-        }
 
         return nullptr;
     }
