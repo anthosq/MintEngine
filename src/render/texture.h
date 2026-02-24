@@ -3,6 +3,7 @@
 #include <filesystem>
 
 #include "core/ref.h"
+#include "core/buffer.h"
 #include <glm/glm.hpp>
 
 // TODO: 完成Asset系统后, 重构Texture相关类
@@ -80,9 +81,11 @@ namespace Mint {
         // 对外接口
         static Ref<Texture2D> Create(const TextureSpecification& spec);
         static Ref<Texture2D> Create(const TextureSpecification& spec, const std::filesystem::path& path);
+        static Ref<Texture2D> Create(const TextureSpecification& spec, Buffer image_data);
 
         // 对内部的实现, 由各个渲染器实现
         virtual void CreateFromFile(const TextureSpecification& spec, const std::filesystem::path& path) = 0;
+        virtual void CreateFromBuffer(const TextureSpecification& spec, Buffer image_data) = 0;
 
         // virtual void ReplaceFromFile(const TextureSpecification& spec, const std::filesystem::path& path) = 0;
 

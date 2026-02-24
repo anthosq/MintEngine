@@ -23,11 +23,18 @@ namespace Mint {
             });
     }
 
+    OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification &spec, Buffer image_data) 
+        : m_specification(spec) {
+        CreateFromBuffer(spec, image_data);
+    }
+
     OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification& spec, const std::filesystem::path& path)
         : m_specification(spec), m_path(path)
     {
         CreateFromFile(spec, path);
     }
+
+
 
 
     void OpenGLTexture2D::CreateFromFile(const TextureSpecification& spec, const std::filesystem::path& path) {
@@ -75,6 +82,51 @@ namespace Mint {
             }
             stbi_image_free(m_image_data.Data);
         });
+    }
+
+    void OpenGLTexture2D::CreateFromBuffer(const TextureSpecification& spec, Buffer image_data) {
+        if (!image_data) {
+            m_isLoaded = false;
+            LOG_ERROR(fmt::format("Failed to load texture image from buffer"));
+            return;
+        } else if (image_data) {
+            m_image_data = Buffer::Copy(image_data.Data, image_data.Size);
+
+            m_specification.Width = spec.Width;
+            m_specification.Height = spec.Height;
+            m_isLoaded = true;
+
+            GLenum internalFormat = 0, dataFormat = 0;
+
+            if (m_specification.Format != TextureFormat::None)
+            {
+                internalFormat = Utils::ToGLTextureFormat(m_specification.Format);
+                dataFormat = internalFormat == GL_RGB8 ? GL_RGB : GL_RGBA;
+            } else {
+                int channels = image_data.Size / (spec.Width * spec.Height);
+                Utils::InferFormatFromChannels(channels, internalFormat, dataFormat);
+                m_specification.Format = (dataFormat == GL_RGB) ? TextureFormat::RGB8 : TextureFormat::RGBA8;
+            }
+
+            // LOG_INFO(fmt::format("Loaded texture {0} ({1}x{2}, {3} channels)", path.string(), width, height, channels));
+            // LOG_INFO(fmt::format("Inferred format: internalFormat={0}, dataFormat={1}", internalFormat, dataFormat));
+
+            RenderSystem::Submit([this, internalFormat, dataFormat]()
+                                 {
+            glCreateTextures(GL_TEXTURE_2D, 1, &m_rendererID);
+            glTextureStorage2D(m_rendererID, 1, internalFormat, m_specification.Width, m_specification.Height);
+
+            // currently without mipmaps
+            glTextureParameteri(m_rendererID, GL_TEXTURE_MIN_FILTER, Utils::ToGLTextureFilter(m_specification.MinFilter));
+            glTextureParameteri(m_rendererID, GL_TEXTURE_MAG_FILTER, Utils::ToGLTextureFilter(m_specification.MagFilter));
+
+            glTextureSubImage2D(m_rendererID, 0, 0, 0, m_specification.Width, m_specification.Height,
+                                dataFormat, GL_UNSIGNED_BYTE, m_image_data.Data);
+
+            if (m_specification.GenerateMipMaps) {
+                glGenerateTextureMipmap(m_rendererID);
+            } });
+        }
     }
 
 

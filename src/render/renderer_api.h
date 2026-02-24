@@ -29,6 +29,8 @@ namespace Mint {
 
             virtual void Clear(const glm::vec4& color) = 0;
 
+            virtual void Shutdown() = 0;
+
             // !TODO: change to accept count and depth test flag
             virtual void DrawIndexed(uint32_t count, bool depthTest = true) = 0;
 

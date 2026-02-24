@@ -8,12 +8,12 @@ namespace Mint {
     // 然后实现Rule of Five?
 
     struct Buffer {
-        byte* Data;
+        void* Data;
         uint32_t Size;
 
         Buffer() : Data(nullptr), Size(0) {}
 
-        Buffer(byte* data, uint32_t size) : Data(data), Size(size) {}
+        Buffer(const void* data, uint32_t size) : Data((void*)data), Size(size) {}
 
         static Buffer Copy(const Buffer& other) {
             Buffer buffer;
@@ -58,19 +58,19 @@ namespace Mint {
                 memset(Data, 0, Size);
         }
 
-        void Write(byte* data, uint32_t size, uint32_t offset = 0) {
+        void Write(void* data, uint32_t size, uint32_t offset = 0) {
             // ASSERT(offset + size <= Size, "Buffer overflow!");
-            memcpy(Data + offset, data, size);
+            memcpy((byte*)Data + offset, data, size);
         }
 
         template <typename T>
         T& Read(uint64_t offset = 0) {
-            return *(T*)(Data + offset);
+            return *(T*)((byte*)Data + offset);
         }
 
         template <typename T>
         const T& Read(uint64_t offset = 0) const {
-            return *(T*)(Data + offset);
+            return *(T*)((byte*)Data + offset);
         }
 
         // read bytes

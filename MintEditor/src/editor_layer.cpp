@@ -320,6 +320,7 @@ void EditorLayer::OnRender(Mint::TimeStep delta_time) {
     m_texture_shader->SetInt("u_Texture", 0); // Texture unit 0
     Mint::g_runtime_global_context.m_render_system->Submit(m_texture_shader, m_plane_vao, transform, false);
 
+
     Mint::g_runtime_global_context.m_render_system->EndScene();
     m_framebuffer->Unbind();
     Mint::g_runtime_global_context.m_render_system->Clear({0.1f, 0.1f, 0.1f, 1});
@@ -340,10 +341,10 @@ void EditorLayer::RenderCubes() {
     auto static_mesh = Mint::AssetManager::GetAsset<Mint::StaticMesh>(m_test_cube);
     auto mesh_source = Mint::AssetManager::GetAsset<Mint::MeshSource>(static_mesh->GetMeshSource());
     transform = glm::translate(glm::mat4(1.0f), glm::vec3(-5.0f, 0.0f, 0.0f));
-    m_cube_texture->Bind();
+    auto m_test_texture = Mint::g_runtime_global_context.m_render_system->GetWhiteTexture();
+    m_test_texture->Bind();
     m_cube_shader->SetInt("u_Texture", 0); // Texture unit 1
     Mint::g_runtime_global_context.m_render_system->SubmitArrays(m_cube_shader, mesh_source->GetVertexArray(), GL_TRIANGLES, 36, 0, transform);
-
 }
 
 void EditorLayer::RenderSkybox() {

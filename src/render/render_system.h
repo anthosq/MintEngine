@@ -3,6 +3,7 @@
 #include "render/render_command_queue.h"
 #include "render/camera.h"
 #include "render/shader.h"
+#include "render/texture.h"
 #include "Core.h"
 #include "editor/editor_camera.h"
 
@@ -23,9 +24,11 @@ namespace Mint {
 
         void DrawArrays(uint32_t mode, uint32_t count, uint32_t first, bool depthTest = true);
 
-		void Init();
+        void Init();
 
-        static const std::unique_ptr<ShaderLibrary>& GetShaderLibrary() { return Get_Renderer().m_shaderLibrary; }
+        void Shutdown();
+
+        static Ref<ShaderLibrary> GetShaderLibrary();
 
         template<typename FuncT>
         static void Submit(FuncT&& func) {
@@ -59,6 +62,9 @@ namespace Mint {
 
         static RenderSystem& Get_Renderer() { return *m_renderer; }
 
+        // temporary Get method for get rendererData
+        static Ref<Texture2D> GetWhiteTexture();
+
         // preparing RenderPass. or maybe render pipeline
 		// static void BeginRenderPass(const Ref<RenderPass>& renderPass);
 		// static void EndRenderPass();
@@ -78,6 +84,7 @@ namespace Mint {
         RenderCommandQueue m_commandQueue;
         std::unique_ptr<ShaderLibrary> m_shaderLibrary;
         std::shared_ptr<RendererAPI> m_rendererAPI;
+
 
         struct SceneData {
             glm::mat4 viewProjectionMatrix;

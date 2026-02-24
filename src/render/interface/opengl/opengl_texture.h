@@ -10,6 +10,7 @@ namespace Mint{
     class OpenGLTexture2D : public Texture2D {
     public:
         OpenGLTexture2D(const TextureSpecification& spec, const std::filesystem::path& path);
+        OpenGLTexture2D(const TextureSpecification& spec, Buffer image_data);
         OpenGLTexture2D(const TextureSpecification& spec);
         // OpenGLTexture2D(unsigned int width, unsigned int height);
         virtual ~OpenGLTexture2D();
@@ -27,6 +28,7 @@ namespace Mint{
 
         const std::filesystem::path& GetPath() const override { return m_path; }
         void CreateFromFile(const TextureSpecification& spec, const std::filesystem::path& path) override;
+        void CreateFromBuffer(const TextureSpecification& spec, Buffer image_data) override;
 
     private:
         std::filesystem::path m_path;

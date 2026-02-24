@@ -17,6 +17,15 @@ namespace Mint {
         return nullptr;
     }
 
+    Ref<Texture2D> Texture2D::Create(const TextureSpecification &spec, Buffer image_data) {
+        switch (RendererAPI::GetAPIType()) {
+            case RendererAPI::RenderAPIType::None:            return nullptr;
+            case RendererAPI::RenderAPIType::OpenGL:          return Ref<OpenGLTexture2D>::Create(spec, image_data);
+        }
+
+        return nullptr;
+    }
+
     Ref<Texture2D> Texture2D::Create(const TextureSpecification& spec) {
         switch (RendererAPI::GetAPIType()) {
             case RendererAPI::RenderAPIType::None:            return nullptr;

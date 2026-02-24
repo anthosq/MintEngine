@@ -17,18 +17,35 @@ namespace Mint {
     // 单例
     RenderSystem* RenderSystem::m_renderer = new RenderSystem();
 
+    struct RenderData {
+        Ref<ShaderLibrary> m_shader_library;
+        Ref<Texture2D> white_texture;
+    };
+
+    static RenderData* m_renderData = nullptr;
 
 
     //temporary
     RenderSystem::SceneData* RenderSystem::m_sceneData = new SceneData;
 
     void RenderSystem::Init() {
+        m_renderData = new RenderData();
         m_rendererAPI = std::make_shared<OpenGLRendererAPI>();
-        m_renderer->m_shaderLibrary = std::make_unique<ShaderLibrary>();
+        m_renderData->m_shader_library = Ref<ShaderLibrary>::Create();
         RenderSystem::Submit([this]() {
             m_rendererAPI->Init();
         });
 
+        // initialize renderdata members
+        uint32_t white_texture_datas = 0xffffffff;
+        m_renderData->white_texture = Texture2D::Create({.Format = TextureFormat::RGBA8, .Width = 1, .Height = 1}, Buffer(&white_texture_datas, sizeof(uint32_t)));
+    }
+
+    void RenderSystem::Shutdown() {
+        RenderSystem::Submit([this]() {
+            m_rendererAPI->Shutdown();
+        });
+        delete m_renderData;
     }
 
     void RenderSystem::Clear() {
@@ -67,7 +84,13 @@ namespace Mint {
         });
     }
 
+    Ref<ShaderLibrary> RenderSystem::GetShaderLibrary() {
+        return m_renderData->m_shader_library;
+    }
 
+    Ref<Texture2D> RenderSystem::GetWhiteTexture() {
+        return m_renderData->white_texture;
+    }
 
     // !!TODO: Actually here we need scene camera which responsible for orthographic/perspective projection matrix
     // Temporary use EditorCamera
@@ -98,6 +121,7 @@ namespace Mint {
         shader->SetMat4("u_Transform", transform);
         vertex_array->Bind();
         DrawIndexed(vertex_array->GetIndexBuffer()->GetCount(), depth_test);
+        vertex_array->Unbind();
     }
 
     // temp?
@@ -109,5 +133,6 @@ namespace Mint {
         shader->SetMat4("u_Transform", transform);
         vertex_array->Bind();
         DrawArrays(mode, count, first, depth_test);
+        vertex_array->Unbind();
     }
 }

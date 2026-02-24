@@ -28,7 +28,7 @@ namespace Mint {
         });
         m_vertex_array->AddVertexBuffer(m_vertex_buffer);
 
-        m_index_buffer = IndexBuffer::Create(m_indices.data(), (uint32_t)(m_indices.size() * sizeof(Index)));
+        m_index_buffer = IndexBuffer::Create(m_indices.data(), (uint32_t)(m_indices.size()));
         m_vertex_array->SetIndexBuffer(m_index_buffer);
 
         m_triangle_cache[0].reserve(indices.size());
