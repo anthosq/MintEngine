@@ -15,6 +15,7 @@ namespace Mint {
         void SetupBuffers();
         void SetupTextures();
         void SetupFramebuffers() {}
+        void TestMeshRendering();
 
         // 渲染Utils
         // void RenderScene();
@@ -56,6 +57,9 @@ namespace Mint {
         // Test Material
         Mint::Ref<Mint::Material> m_test_material;
         glm::vec4 test_color;
+
+        // Test Cube
+        Mint::AssetHandle m_test_cube;
 
         // view port
         glm::vec2 m_ViewportSize = {1280.0f, 720.0f};

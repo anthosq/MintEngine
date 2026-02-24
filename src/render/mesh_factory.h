@@ -6,7 +6,8 @@ namespace Mint {
     // Need to change after implement asset
     class MeshFactory {
     public:
-        static Ref<Mesh> CreateCube(const glm::vec3& size);
+        static AssetHandle CreateCollisionCube(const glm::vec3& size);
+        static AssetHandle CreateTextureCube(const glm::vec3& size);
         static Ref<Mesh> CreatePlane(const glm::vec3& size);
         static Ref<Mesh> CreateSphere(){}
         static Ref<Mesh> CreateCapsule() {}

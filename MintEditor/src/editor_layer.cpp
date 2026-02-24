@@ -201,7 +201,6 @@ void EditorLayer::SetupBuffers() {
     // Cube
     m_cube_vao = Mint::VertexArray::Create();
     Mint::Ref<Mint::VertexBuffer> cube_vbo;
-    // Mint::Ref<Mint::IndexBuffer> cube_ibo;
     cube_vbo = Mint::VertexBuffer::Create(cube_vertices, sizeof(cube_vertices));
     Mint::BufferLayout cube_layout = {
         {Mint::ShaderDataType::Float3, "a_Position"},
@@ -234,6 +233,10 @@ void EditorLayer::SetupBuffers() {
     m_plane_vao->SetIndexBuffer(m_plane_ibo);
 
     // ScreenQuad VAO
+
+    // test mesh
+    m_test_cube = Mint::MeshFactory::CreateTextureCube(glm::vec3(1.0f, 1.0f, 1.0f));
+
 
     // framebuffer
     m_framebuffer = Mint::Framebuffer::Create({.Width = 1280, .Height = 720, .Attachments = {Mint::FramebufferTextureSpecification(Mint::FramebufferTextureFormat::RGBA8),
@@ -332,6 +335,15 @@ void EditorLayer::RenderCubes() {
     auto m_cube_shader = m_shader_library.Get("cube_shader");
     m_cube_shader->SetInt("u_Texture", 0); // Texture unit 1
     Mint::g_runtime_global_context.m_render_system->SubmitArrays(m_cube_shader, m_cube_vao, GL_TRIANGLES, 36, 0, transform);
+
+    // test mesh
+    auto static_mesh = Mint::AssetManager::GetAsset<Mint::StaticMesh>(m_test_cube);
+    auto mesh_source = Mint::AssetManager::GetAsset<Mint::MeshSource>(static_mesh->GetMeshSource());
+    transform = glm::translate(glm::mat4(1.0f), glm::vec3(-5.0f, 0.0f, 0.0f));
+    m_cube_texture->Bind();
+    m_cube_shader->SetInt("u_Texture", 0); // Texture unit 1
+    Mint::g_runtime_global_context.m_render_system->SubmitArrays(m_cube_shader, mesh_source->GetVertexArray(), GL_TRIANGLES, 36, 0, transform);
+
 }
 
 void EditorLayer::RenderSkybox() {

@@ -53,7 +53,8 @@ namespace Mint {
             return asset ? asset.As<T>() : nullptr;
         }
 
-        static AssetHandle AddMemoryOnlyAsset(Ref<Asset>& asset) {
+        // 后续使用模板判断是否是asset派生类, 并设置各类资源的asset
+        static AssetHandle AddMemoryOnlyAsset(Ref<Asset> asset) {
             if (asset->Handle == 0) {
                 asset->Handle = AssetHandle();
             }
@@ -76,4 +77,7 @@ namespace Mint {
 
         static std::unordered_map<AssetHandle, Ref<Asset>> s_loaded_assets;
     };
+
+    // Note: Usually static definitions go into a .cpp file to avoid multiple definition errors ("inline" fixes this in C++17 headers)
+    inline std::unordered_map<AssetHandle, Ref<Asset>> AssetManager::s_loaded_assets;
 }

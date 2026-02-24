@@ -220,6 +220,11 @@ namespace Mint {
 					aiMaterialName.data, aiColor.r, aiColor.g, aiColor.b, roughness, metalness, emission
 				));
 
+				bool hasAlbedoMap = aiMaterial->GetTexture(AI_MATKEY_BASE_COLOR_TEXTURE, &aiTexPath) == AI_SUCCESS;
+				if (!hasAlbedoMap) {
+					// try diffuse
+					hasAlbedoMap = aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &aiTexPath) == AI_SUCCESS;
+				}
 
 			}
 		}

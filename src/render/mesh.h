@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include "asset/asset.h"
 #include "render/buffer.h"
+#include "render/vertex_array.h"
 #include "core/time_step.h"
 #include "render/shader.h"
 #include "render/material.h"
@@ -160,6 +161,7 @@ namespace Mint {
 
         Ref<VertexBuffer> GetVertexBuffer() { return m_vertex_buffer; }
         Ref<IndexBuffer> GetIndexBuffer() { return m_index_buffer; }
+        Ref<VertexArray> GetVertexArray() { return m_vertex_array; }
 
         const AABB& GetBoundingBox() const { return m_bounding_box; }
 
@@ -176,6 +178,9 @@ namespace Mint {
 
         Ref<VertexBuffer> m_vertex_buffer;
         Ref<IndexBuffer> m_index_buffer;
+
+        // temp
+        Ref<VertexArray> m_vertex_array;
 
         std::vector<Vertex> m_vertices;
         std::vector<Index> m_indices;

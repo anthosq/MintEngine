@@ -25,6 +25,8 @@
 #include "render/framebuffer.h"
 #include "render/uniform_buffer.h"
 #include "render/material.h"
+#include "render/mesh.h"
+#include "render/mesh_factory.h"
 
 // Scene
 #include "scene/scene.h"

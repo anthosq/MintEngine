@@ -15,8 +15,21 @@ namespace Mint {
         submesh.IndexCount = static_cast<uint32_t>(indices.size()) * 3u;
         submesh.Transform = transform;
 
+        // temp, 后续应该把vertex_array移动到别的地方
+        m_vertex_array = VertexArray::Create();
         m_vertex_buffer = VertexBuffer::Create(m_vertices.data(), (uint32_t)(m_vertices.size() * sizeof(Vertex)));
+        // 对于animated对象, 后续需要增加处理,尽量解耦
+        m_vertex_buffer->SetLayout({
+            { ShaderDataType::Float3, "a_Position" },
+            { ShaderDataType::Float3, "a_Normal" },
+            { ShaderDataType::Float3, "a_Tangent" },
+            { ShaderDataType::Float3, "a_Bitangent" },
+            { ShaderDataType::Float2, "a_TexCoords" }
+        });
+        m_vertex_array->AddVertexBuffer(m_vertex_buffer);
+
         m_index_buffer = IndexBuffer::Create(m_indices.data(), (uint32_t)(m_indices.size() * sizeof(Index)));
+        m_vertex_array->SetIndexBuffer(m_index_buffer);
 
         m_triangle_cache[0].reserve(indices.size());
         for (const Index &index : indices) {
